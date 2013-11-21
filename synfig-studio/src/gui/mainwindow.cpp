@@ -105,6 +105,13 @@ MainWindow::MainWindow()
 		vbox->pack_start(*menubar, false, false, 0);
 	}
 
+	Gtk::Widget* toolbar = App::ui_manager()->get_widget("/toolbar-main");
+	if (toolbar != NULL)
+	{
+		menubar->show();
+		vbox->pack_start(*toolbar, false, false, 0);
+	}
+
 	vbox->pack_end(*bin_, true, true, 0);
 	vbox->show();
 	add(*vbox);
