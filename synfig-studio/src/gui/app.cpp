@@ -818,7 +818,7 @@ init_ui_manager()
 	menus_action_group->add( Gtk::Action::create("menu-keyframe", _("Keyframe")) );
 	menus_action_group->add( Gtk::Action::create("menu-group", _("Set")) );
 	menus_action_group->add( Gtk::Action::create("menu-state", _("Tool")) );
-	menus_action_group->add( Gtk::Action::create("menu-toolbox", _("Toolbox")) );
+	//menus_action_group->add( Gtk::Action::create("menu-toolbox", _("Toolbox")) );
 	menus_action_group->add( Gtk::Action::create("menu-plugins", _("Plug-Ins")) );
 	menus_action_group->add( Gtk::Action::create("menu-help", _("_Help")) );
 

@@ -164,47 +164,6 @@ Dock_Toolbox::Dock_Toolbox():
 	set_use_scrolled(false);
 	set_size_request(-1,-1);
 
-	Gtk::Image *icon;
-
-	ADD_TOOLBOX_BUTTON(button_new,"gtk-new",_("New..."));
-	ADD_TOOLBOX_BUTTON(button_open,"gtk-open",_("Open..."));
-	ADD_TOOLBOX_BUTTON(button_save,"gtk-save",_("Save"));
-	ADD_TOOLBOX_BUTTON(button_saveas,"gtk-save-as",_("Save As..."));
-	ADD_TOOLBOX_BUTTON(button_save_all,"synfig-saveall",_("Save All"));
-	TOOLBOX_BUTTON(button_undo,"gtk-undo",_("Undo"));
-	TOOLBOX_BUTTON(button_redo,"gtk-redo",_("Redo"));
-	ADD_TOOLBOX_BUTTON(button_setup,"gtk-properties",_("Setup"));
-	ADD_TOOLBOX_BUTTON(button_about,"synfig-about",_("About Synfig Studio"));
-	ADD_TOOLBOX_BUTTON(button_help,"gtk-help",_("Help"));
-
-	button_setup->signal_clicked().connect(sigc::ptr_fun(studio::App::show_setup));
-	button_about->signal_clicked().connect(sigc::ptr_fun(studio::App::dialog_about));
-	button_help->signal_clicked().connect(sigc::ptr_fun(studio::App::dialog_help));
-	button_new->signal_clicked().connect(sigc::ptr_fun(studio::App::new_instance));
-	button_open->signal_clicked().connect(sigc::bind(sigc::ptr_fun(studio::App::dialog_open), ""));
-	button_save->signal_clicked().connect(sigc::ptr_fun(save_selected_instance));
-	button_saveas->signal_clicked().connect(sigc::ptr_fun(save_as_selected_instance));
-	button_save_all->signal_clicked().connect(sigc::ptr_fun(save_all));
-	button_undo->signal_clicked().connect(sigc::ptr_fun(studio::App::undo));
-	button_redo->signal_clicked().connect(sigc::ptr_fun(studio::App::redo));
-
-	// Create the file button cluster
-	Gtk::Table *file_buttons=manage(new class Gtk::Table());
-
-	file_buttons->attach(*button_new,      0,1, 0,1,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_open,     1,2, 0,1,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_save,     2,3, 0,1,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_saveas,   3,4, 0,1,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_save_all, 4,5, 0,1,Gtk::SHRINK,Gtk::SHRINK);
-
-	file_buttons->attach(*button_undo,     0,1, 1,2,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_redo,     1,2, 1,2,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_setup,    2,3, 1,2,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_about,    3,4, 1,2,Gtk::SHRINK,Gtk::SHRINK);
-	file_buttons->attach(*button_help,     4,5, 1,2,Gtk::SHRINK,Gtk::SHRINK);
-
-	file_buttons->show();
-
 	tool_table=manage(new class Gtk::Table());
 	tool_table->show();
 	Gtk::HandleBox* handle_tools(manage(new Gtk::HandleBox()));
@@ -225,9 +184,8 @@ Dock_Toolbox::Dock_Toolbox():
 	Gtk::Table *table1 = manage(new class Gtk::Table(1, 2, false));
 	table1->set_row_spacings(0);
 	table1->set_col_spacings(0);
-	table1->attach(*file_buttons,    0,1, 1,2, Gtk::FILL,Gtk::FILL, 0, 0);
-	table1->attach(*handle_tools,    0,1, 2,3, Gtk::FILL,Gtk::FILL, 0, 0);
-	table1->attach(*handle_defaults, 0,1, 3,4, Gtk::FILL,Gtk::FILL, 0, 0);
+	table1->attach(*handle_tools,    0,1, 1,2, Gtk::FILL,Gtk::FILL, 0, 0);
+	table1->attach(*handle_defaults, 0,1, 2,3, Gtk::FILL,Gtk::FILL, 0, 0);
 	table1->show_all();
 
 	add(*table1);
@@ -237,9 +195,6 @@ Dock_Toolbox::Dock_Toolbox():
 			sigc::mem_fun(*this,&studio::Dock_Toolbox::update_undo_redo)
 		)
 	);
-
-	button_undo->set_sensitive(false);
-	button_redo->set_sensitive(false);
 
 	std::list<Gtk::TargetEntry> listTargets;
 	listTargets.push_back( Gtk::TargetEntry("text/plain") );
@@ -398,11 +353,6 @@ void
 Dock_Toolbox::update_undo_redo()
 {
 	etl::handle<Instance> instance=App::get_selected_instance();
-	if(instance)
-	{
-		button_undo->set_sensitive(instance->get_undo_status());
-		button_redo->set_sensitive(instance->get_redo_status());
-	}
 
 	// This should probably go elsewhere, but it should
 	// work fine here with no troubles.
