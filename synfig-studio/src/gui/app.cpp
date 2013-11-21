@@ -1111,6 +1111,18 @@ init_ui_manager()
 "		<menuitem action='help-about'/>"
 "	</menu>";
 
+	Glib::ustring ui_info_tool =
+"		<toolitem action='new'/>"
+"		<toolitem action='open'/>"
+"		<toolitem action='save'/>"
+"		<toolitem action='save-as'/>"
+"		<toolitem action='save-all'/>"
+"		<toolitem action='redo'/>"
+"		<toolitem action='undo'/>"
+"		<toolitem action='setup'/>"
+"		<toolitem action='help-about'/>"
+"		<toolitem action='help'/>";
+
 	Glib::ustring ui_info =
 "<ui>"
 "   <popup name='menu-toolbox' action='menu-toolbox'>"
@@ -1119,6 +1131,7 @@ init_ui_manager()
 "	</popup>"
 "	<popup name='menu-main' action='menu-main'>" + ui_info_menu + "</popup>"
 "	<menubar name='menubar-main' action='menubar-main'>" + ui_info_menu + "</menubar>"
+"	<toolbar name='toolbar-main'>" + ui_info_tool + "</toolbar>"
 "</ui>";
 
 	#undef DEFINE_ACTION
