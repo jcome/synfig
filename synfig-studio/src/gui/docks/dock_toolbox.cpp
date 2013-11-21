@@ -100,14 +100,6 @@ using namespace sigc;
 
 /* === M E T H O D S ======================================================= */
 
-#define TOGGLE_TOOLBOX_BUTTON(button,stockid,tooltip)	\
-	button = manage(new class Gtk::ToggleButton());	\
-	icon=manage(new Gtk::Image(Gtk::StockID(stockid),Gtk::IconSize(4)));	\
-	button->add(*icon);	\
-	button->set_tooltip_text(tooltip);	\
-	icon->show();	\
-	button->show()
-
 #define TOOLBOX_BUTTON(button,stockid,tooltip)	\
 	button = manage(new class Gtk::Button());	\
 	icon=manage(new Gtk::Image(Gtk::StockID(stockid),Gtk::IconSize(4)));	\
