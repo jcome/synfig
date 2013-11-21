@@ -110,53 +110,6 @@ using namespace sigc;
 
 #define ADD_TOOLBOX_BUTTON(button,stockid,tooltip)	Gtk::Button *TOOLBOX_BUTTON(button,stockid,tooltip)
 
-void
-save_selected_instance()
-{
-	if(!studio::App::get_selected_instance())
-	{
-		App::dialog_error_blocking(_("Cannot save"),_("Nothing to save"));
-		return;
-	}
-
-	studio::App::get_selected_instance()->save();
-}
-
-void
-save_as_selected_instance()
-{
-	if(!studio::App::get_selected_instance())
-	{
-		App::dialog_error_blocking(_("Cannot save as"),_("Nothing to save"));
-		return;
-	}
-
-	studio::App::get_selected_instance()->dialog_save_as();
-}
-
-void
-save_all()
-{
-	std::list<etl::handle<Instance> >::iterator iter;
-	for(iter=App::instance_list.begin();iter!=App::instance_list.end();iter++)
-		(*iter)->save();
-}
-
-void
-close_selected_instance()
-{
-	etl::handle<studio::Instance> instance=studio::App::get_selected_instance();
-
-	if(!instance)
-	{
-		App::dialog_error_blocking(_("Cannot close"),_("Nothing to close"));
-		return;
-	}
-
-	instance->safe_close();
-
-	//assert(instance.unique());
-}
 
 Dock_Toolbox::Dock_Toolbox():
 	Dockable("toolbox",_("Toolbox"),Gtk::StockID("synfig-toolbox"))
