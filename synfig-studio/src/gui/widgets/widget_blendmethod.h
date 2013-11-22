@@ -6,6 +6,7 @@
 **
 **	\legal
 **	Copyright (c) 2002-2005 Robert B. Quattlebaum Jr., Adrian Bentley
+**	Copyright (c) 2002-2005 Yu Chen
 **
 **	This package is free software; you can redistribute it and/or
 **	modify it under the terms of the GNU General Public License as
@@ -27,10 +28,7 @@
 
 /* === H E A D E R S ======================================================= */
 
-#include <gtkmm/drawingarea.h>
 #include <gtkmm/table.h>
-#include <synfig/gradient.h>
-#include "widgets/widget_gradient.h"
 #include <gtkmm/tooltip.h>
 
 /* === M A C R O S ========================================================= */
@@ -39,50 +37,21 @@
 
 /* === C L A S S E S & S T R U C T S ======================================= */
 
-namespace Gtk { class HScale; }
-
 namespace studio {
 
-class Widget_Brush;
-class Widget_Color;
-class Widget_Distance;
-class Widget_Enum;
+	class Widget_Enum;
 
-class Widget_Defaults : public Gtk::Table
-{
-	Widget_Brush *widget_brush;
-	Widget_Color *widget_otln_color;
-	Widget_Color *widget_fill_color;
-	Widget_Distance *widget_bline_width;
-	Widget_Gradient *widget_gradient;
-	Gtk::HScale *widget_opacity;
+	class Widget_Blend_Method : public Gtk::Table
+	{
+		Widget_Enum	*widget_blend_method;
+		void blend_method_refresh();
+		void on_blend_method_changed();
 
-	void otln_color_refresh();
-	void fill_color_refresh();
-	void gradient_refresh();
-	void bline_width_refresh();
+		public:
 
-	void on_bline_width_changed();
-	void on_otln_color_clicked();
-	void on_fill_color_clicked();
-	void on_swap_color_clicked();
-	void on_reset_color_clicked();
-	void on_gradient_clicked();
-
-	void opacity_refresh();
-	void on_opacity_changed();
-
-public:
-
-	Widget_Defaults();
-
-	~Widget_Defaults();
-
-//	bool redraw(GdkEventExpose*bleh=NULL);
-
-//	bool on_event(GdkEvent *event);
-}; // END of class BlackLevelSelector
-
+		Widget_Blend_Method();
+		~Widget_Blend_Method();
+	}; // END of class BlackLevelSelector
 }; // END of namespace studio
 
 /* === E N D =============================================================== */
