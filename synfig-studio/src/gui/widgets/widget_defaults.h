@@ -39,14 +39,11 @@
 
 /* === C L A S S E S & S T R U C T S ======================================= */
 
-namespace Gtk { class HScale; }
-
 namespace studio {
 
 class Widget_Brush;
 class Widget_Color;
 class Widget_Distance;
-class Widget_Enum;
 
 class Widget_Defaults : public Gtk::Table
 {
