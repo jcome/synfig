@@ -852,8 +852,8 @@ init_ui_manager()
 	DEFINE_ACTION("cvs-commit", Gtk::StockID("synfig-cvs_commit"));
 	DEFINE_ACTION("cvs-revert", Gtk::StockID("synfig-cvs_revert"));
 	DEFINE_ACTION("import", _("Import"));
-	DEFINE_ACTION("render", _("Render"));
-	DEFINE_ACTION("preview", _("Preview"));
+	DEFINE_ACTION("render", Gtk::StockID("synfig-render_options"));
+	DEFINE_ACTION("preview", Gtk::StockID("synfig-preview_options"));
 	DEFINE_ACTION("dialog-flipbook", _("Preview Dialog"));
 	DEFINE_ACTION("sound", _("Sound File"));
 	DEFINE_ACTION("options", _("Options"));
@@ -939,7 +939,7 @@ init_ui_manager()
 	DEFINE_ACTION("help-reference", _("Reference"));
 	DEFINE_ACTION("help-faq", _("Frequently Asked Questions"));
 	DEFINE_ACTION("help-support", _("Get Support"));
-	DEFINE_ACTION("help-about", Gtk::StockID("synfig-about"));
+	//DEFINE_ACTION("help-about", Gtk::StockID("synfig-about"));
 
   //Layout the actions in the main menu (caret menu, right click on canvas menu) and toolbar:
 	Glib::ustring ui_info_menu =
@@ -1123,7 +1123,9 @@ init_ui_manager()
 "		<toolitem action='undo'/>"
 "		<toolitem action='setup'/>"
 "		<toolitem action='help-about'/>"
-"		<toolitem action='help'/>";
+"		<toolitem action='help'/>"
+"		<toolitem action='render'/>"
+"		<toolitem action='preview'/>";
 
 	Glib::ustring ui_info =
 "<ui>"
