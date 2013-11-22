@@ -315,6 +315,7 @@ IconController::IconController(const synfig::String& /*basepath*/)
 	INIT_STOCK_ICON(decrease_resolution,"decr_resolution_icon."IMAGE_EXT,_("Decrease resolution"));
 
 	INIT_STOCK_ICON(preview_options,"preview_options_icon."IMAGE_EXT,_("Preview Options Dialog"));
+	INIT_STOCK_ICON(preview_window,"preview_options_icon."IMAGE_EXT,_("Preview Window"));
 	INIT_STOCK_ICON(render_options,"render_options_icon."IMAGE_EXT,_("Render Options Dialog"));
 
 	INIT_STOCK_ICON(interpolation_type_tcb,"interpolation_type_tcb_icon."IMAGE_EXT,_("TCB interpolation"));
