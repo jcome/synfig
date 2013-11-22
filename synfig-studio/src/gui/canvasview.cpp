@@ -760,8 +760,8 @@ CanvasView::CanvasView(etl::loose_handle<Instance> instance,etl::handle<synfigap
 
 	Gtk::Table *layout_table= manage(new class Gtk::Table(5, 1, false));
 	//layout_table->attach(*vpaned, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_work_area(),   0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_display_bar(), 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	layout_table->attach(*create_work_area(),   0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
+	layout_table->attach(*create_display_bar(), 0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	init_menus();
 	//layout_table->attach(*App::ui_manager()->get_widget("/menu-main"), 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	layout_table->attach(*create_time_bar(),    0, 1, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
@@ -997,18 +997,6 @@ CanvasView::create_time_bar()
 	//time_scroll->signal_value_changed().connect(sigc::mem_fun(*work_area, &studio::WorkArea::render_preview_hook));
 	//time_scroll->set_update_policy(Gtk::UPDATE_DISCONTINUOUS);
 
-	//Setup the Animation Mode Button and the Keyframe Lock button
-	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
-	Gtk::Image *icon = manage(new Gtk::Image(Gtk::StockID("synfig-animate_mode_off"), iconsize));
-	animatebutton = Gtk::manage(new class Gtk::ToggleButton());
-	animatebutton->set_tooltip_text(_("Turn on animate editing mode"));
-	icon->set_padding(0,0);
-	icon->show();
-	animatebutton->add(*icon);
-	animatebutton->signal_toggled().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
-	animatebutton->set_relief(Gtk::RELIEF_NONE);
-	animatebutton->show();
-
 	//Setup the audio display
 	disp_audio->set_size_request(-1,32); //disp_audio->show();
 	disp_audio->set_time_adjustment(&time_adjustment());
@@ -1032,28 +1020,6 @@ CanvasView::create_time_bar()
 	current_time_widget->set_tooltip_text(_("Current time"));
 	current_time_widget->show();
 
-	//Setup the FrameDial widget
-	framedial = manage(new class FrameDial());
-	framedial->signal_seek_begin().connect(
-			sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::begin())
-	);
-	framedial->signal_seek_prev_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_prev_keyframe));
-	framedial->signal_seek_prev_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), -1));
-	framedial->signal_play().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
-	framedial->signal_pause().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
-	framedial->signal_seek_next_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), 1));
-	framedial->signal_seek_next_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_next_keyframe));
-	framedial->signal_seek_end().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::end()));
-	framedial->show();
-
-	//Setup the KeyFrameDial widget
-	KeyFrameDial *keyframedial = Gtk::manage(new class KeyFrameDial());
-	keyframedial->signal_toggle_keyframe_past().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe_button));
-	keyframedial->signal_toggle_keyframe_future().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe_button));
-	keyframedial->show();
-	pastkeyframebutton=keyframedial->get_toggle_pastbutton();
-	futurekeyframebutton=keyframedial->get_toggle_futurebutton();
-
 	timebar = Gtk::manage(new class Gtk::Table(6, 3, false));
 
 	//Adjust both widgets to be the same as the
@@ -1065,10 +1031,6 @@ CanvasView::create_time_bar()
 	timeslider->set_size_request(-1,header_height-header_height/3+1);
 	widget_kf_list->set_size_request(-1,header_height/3+1);
 
-	Gtk::Alignment *space = Gtk::manage(new Gtk::Alignment());
-	space->set_size_request(8);
-        space->show();
-
 	//Attach widgets to the timebar
 	//timebar->attach(*manage(disp_audio), 1, 5, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
 	timebar->attach(*current_time_widget, 0, 1, 0, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
@@ -1076,10 +1038,6 @@ CanvasView::create_time_bar()
 	timebar->attach(*widget_kf_list, 1, 3, 0, 1, Gtk::FILL|Gtk::EXPAND, Gtk::FILL|Gtk::SHRINK);
 	timebar->attach(*timeslider, 1, 3, 1, 2, Gtk::FILL|Gtk::SHRINK, Gtk::FILL|Gtk::SHRINK);
 	timebar->attach(*time_window_scroll, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
-	timebar->attach(*keyframedial, 3, 4, 0, 2, Gtk::SHRINK, Gtk::SHRINK);
-	timebar->attach(*space, 4, 5, 0, 2, Gtk::FILL, Gtk::FILL);
-	timebar->attach(*animatebutton, 5, 6, 0, 2, Gtk::SHRINK, Gtk::SHRINK);
-	//timebar->attach(*keyframebutton, 1, 2, 3, 4, Gtk::SHRINK, Gtk::SHRINK);
 
 	timebar->show();
 
@@ -1144,8 +1102,10 @@ CanvasView::create_status_bar()
 Gtk::Widget*
 CanvasView::create_display_bar()
 {
-	displaybar = manage(new class Gtk::Table(1, 16, false));
+	displaybar = manage(new class Gtk::Table(1, 24, false));
+
 	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
+
 	// Setup the ToggleDuckDial widget
 	toggleducksdial = Gtk::manage(new class ToggleDucksDial(iconsize));
 
@@ -1185,6 +1145,9 @@ CanvasView::create_display_bar()
 	resolutiondial->show();
 
 	// Set up some separators
+
+	Gtk::VSeparator *separator0 = Gtk::manage(new class Gtk::VSeparator());
+	separator0->show();
 	Gtk::VSeparator *separator1 = Gtk::manage(new class Gtk::VSeparator());
 	separator1->show();
 	Gtk::VSeparator *separator2 = Gtk::manage(new class Gtk::VSeparator());
@@ -1195,6 +1158,9 @@ CanvasView::create_display_bar()
 	separator4->show();
 	Gtk::VSeparator *separator5 = Gtk::manage(new class Gtk::VSeparator());
 	separator5->show();
+	Gtk::Alignment *space = Gtk::manage(new Gtk::Alignment());
+	space->set_size_request(8);
+	space->show();
 
 	// Set up quality spin button
 	quality_spin=Gtk::manage(new class Gtk::SpinButton(quality_adjustment_));
@@ -1280,23 +1246,58 @@ CanvasView::create_display_bar()
 	preview_options_button->set_relief(Gtk::RELIEF_NONE);
 	preview_options_button->show();
 
+	framedial = manage(new class FrameDial());
+	framedial->signal_seek_begin().connect(
+			sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::begin())
+	);
+	framedial->signal_seek_prev_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_prev_keyframe));
+	framedial->signal_seek_prev_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), -1));
+	framedial->signal_play().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
+	framedial->signal_pause().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
+	framedial->signal_seek_next_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), 1));
+	framedial->signal_seek_next_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_next_keyframe));
+	framedial->signal_seek_end().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::end()));
+	framedial->show();
 
-	displaybar->attach(*toggleducksdial,         0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator1,              1,  2, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*resolutiondial,          2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator2,              3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*quality_spin,            4,  5, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator3,              5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*show_grid,               6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*snap_grid,               7,  8, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator4,              8,  9, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*past_onion_spin,         9, 10, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*onion_skin,             10, 11, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*future_onion_spin,      11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator5,             12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*render_options_button,  13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*preview_options_button, 14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	//Setup the KeyFrameDial widget
+	KeyFrameDial *keyframedial = Gtk::manage(new class KeyFrameDial());
+	keyframedial->signal_toggle_keyframe_past().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe_button));
+	keyframedial->signal_toggle_keyframe_future().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe_button));
+	keyframedial->show();
+	pastkeyframebutton=keyframedial->get_toggle_pastbutton();
+	futurekeyframebutton=keyframedial->get_toggle_futurebutton();
 
+	//Setup the Animation Mode Button
+	Gtk::Image *icon6 = manage(new Gtk::Image(Gtk::StockID("synfig-animate_mode_off"), iconsize));
+	animatebutton = Gtk::manage(new class Gtk::ToggleButton());
+	animatebutton->set_tooltip_text(_("Turn on animate editing mode"));
+	icon6->set_padding(0,0);
+	icon6->show();
+	animatebutton->add(*icon6);
+	animatebutton->signal_toggled().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
+	animatebutton->set_relief(Gtk::RELIEF_NONE);
+	animatebutton->show();
+
+	displaybar->attach(*framedial,				0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator0,				1,  2, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*toggleducksdial,		2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator1,				3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*resolutiondial,			4,  5, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator2,				5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*quality_spin,			6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator3,				7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*show_grid,				8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*snap_grid,				9,  10, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator4,				10,  11, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*past_onion_spin,		11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*onion_skin,				12, 13, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*future_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*render_options_button,	14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*preview_options_button,	15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator5,				16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*keyframedial,			17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*space,					18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
+	displaybar->attach(*animatebutton,			19, 20, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->show();
 
 	return displaybar;
