@@ -279,18 +279,6 @@ Widget_Defaults::Widget_Defaults()
 	attach(*widget_bline_width,1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	widget_bline_width->set_tooltip_text(_("Brush Size"));
 
-
-	widget_blend_method=manage(new Widget_Enum());
-	widget_blend_method->set_size_request(0, -1);
-	widget_blend_method->show();
-	widget_blend_method->signal_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::on_blend_method_changed));
-	widget_blend_method->set_param_desc(
-		ParamDesc(Color::BLEND_COMPOSITE,"blend_method")
-		.add_enum_value(Color::BLEND_BY_LAYER,"bylayer", _("By Layer Default"))
-	);
-	attach(*widget_blend_method,0, 2, 2, 3, Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 1, 1);
-	widget_blend_method->set_tooltip_text(_("Default Blend Method"));
-
 	widget_opacity=manage(new Gtk::HScale(0.0f,1.01f,0.01f));
 	widget_opacity->show();
 	widget_opacity->set_digits(2);
@@ -313,12 +301,10 @@ Widget_Defaults::Widget_Defaults()
 	synfigapp::Main::signal_outline_color_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::otln_color_refresh));
 	synfigapp::Main::signal_fill_color_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::fill_color_refresh));
 	synfigapp::Main::signal_gradient_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::gradient_refresh));
-	synfigapp::Main::signal_blend_method_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::blend_method_refresh));
 
 	otln_color_refresh();
 	fill_color_refresh();
 	gradient_refresh();
-	blend_method_refresh();
 	opacity_refresh();
 /*
 	set_size_request(48,48+GRADIENT_HEIGHT);
@@ -375,12 +361,6 @@ Widget_Defaults::bline_width_refresh()
 	widget_bline_width->set_value(synfigapp::Main::get_bline_width());
 }
 
-void
-Widget_Defaults::blend_method_refresh()
-{
-	widget_blend_method->set_value(synfigapp::Main::get_blend_method());
-}
-
 
 void
 Widget_Defaults::opacity_refresh()
@@ -392,12 +372,6 @@ void
 Widget_Defaults::on_opacity_changed()
 {
 	synfigapp::Main::set_opacity(widget_opacity->get_value());
-}
-
-void
-Widget_Defaults::on_blend_method_changed()
-{
-	synfigapp::Main::set_blend_method(Color::BlendMethod(widget_blend_method->get_value()));
 }
 
 
