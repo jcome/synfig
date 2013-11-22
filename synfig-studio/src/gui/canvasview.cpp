@@ -1585,7 +1585,7 @@ CanvasView::init_menus()
 	);
 
 
-	action_group->add( Gtk::Action::create("dialog-flipbook", _("Preview Window")),
+	action_group->add( Gtk::Action::create("dialog-flipbook", Gtk::StockID("synfig-preview_window")),
 		sigc::mem_fun0(*preview_dialog, &studio::Dialog_Preview::present)
 	);
 	// Prevent call to preview window before preview option has created the preview window
