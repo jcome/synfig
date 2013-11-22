@@ -279,14 +279,6 @@ Widget_Defaults::Widget_Defaults()
 	attach(*widget_bline_width,1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	widget_bline_width->set_tooltip_text(_("Brush Size"));
 
-	widget_opacity=manage(new Gtk::HScale(0.0f,1.01f,0.01f));
-	widget_opacity->show();
-	widget_opacity->set_digits(2);
-	widget_opacity->set_value_pos(Gtk::POS_LEFT);
-	widget_opacity->signal_value_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::on_opacity_changed));
-	attach(*widget_opacity,0, 2, 3, 4, Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 1, 1);
-	widget_opacity->set_tooltip_text(_("Default Opacity"));
-
 	widget_gradient=manage(new Widget_Gradient());
 	widget_gradient->show();
 	widget_gradient->set_size_request(-1,GRADIENT_HEIGHT);
@@ -296,7 +288,6 @@ Widget_Defaults::Widget_Defaults()
 
 
 	// Signals
-	synfigapp::Main::signal_opacity_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::opacity_refresh));
 	synfigapp::Main::signal_bline_width_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::bline_width_refresh));
 	synfigapp::Main::signal_outline_color_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::otln_color_refresh));
 	synfigapp::Main::signal_fill_color_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::fill_color_refresh));
@@ -305,7 +296,6 @@ Widget_Defaults::Widget_Defaults()
 	otln_color_refresh();
 	fill_color_refresh();
 	gradient_refresh();
-	opacity_refresh();
 /*
 	set_size_request(48,48+GRADIENT_HEIGHT);
 	signal_expose_event().connect(sigc::mem_fun(*this, &studio::Widget_Defaults::redraw));
@@ -359,19 +349,6 @@ void
 Widget_Defaults::bline_width_refresh()
 {
 	widget_bline_width->set_value(synfigapp::Main::get_bline_width());
-}
-
-
-void
-Widget_Defaults::opacity_refresh()
-{
-	widget_opacity->set_value(synfigapp::Main::get_opacity());
-}
-
-void
-Widget_Defaults::on_opacity_changed()
-{
-	synfigapp::Main::set_opacity(widget_opacity->get_value());
 }
 
 
