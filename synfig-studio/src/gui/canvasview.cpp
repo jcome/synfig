@@ -1222,30 +1222,6 @@ CanvasView::create_display_bar()
 	future_onion_spin->set_tooltip_text( _("Future onion skins"));
 	future_onion_spin->show();
 
-	// Setup render options dialog button
-	render_options_button = Gtk::manage(new class Gtk::Button());
-	Gtk::Image *icon4 = manage(new Gtk::Image(Gtk::StockID("synfig-render_options"), iconsize));
-	icon4->set_padding(0, 0);
-	icon4->show();
-	render_options_button->add(*icon4);
-	render_options_button->signal_clicked().connect(
-			sigc::mem_fun0(render_settings,&studio::RenderSettings::present));
-	render_options_button->set_tooltip_text( _("Shows the Render Settings Dialog"));
-	render_options_button->set_relief(Gtk::RELIEF_NONE);
-	render_options_button->show();
-
-	// Setup preview options dialog button
-	preview_options_button = Gtk::manage(new class Gtk::Button());
-	Gtk::Image *icon5 = manage(new Gtk::Image(Gtk::StockID("synfig-preview_options"), iconsize));
-	icon5->set_padding(0, 0);
-	icon5->show();
-	preview_options_button->add(*icon5);
-	preview_options_button->signal_clicked().connect(
-			sigc::mem_fun(*this,&CanvasView::on_preview_option));
-	preview_options_button->set_tooltip_text( _("Shows the Preview Settings Dialog"));
-	preview_options_button->set_relief(Gtk::RELIEF_NONE);
-	preview_options_button->show();
-
 	framedial = manage(new class FrameDial());
 	framedial->signal_seek_begin().connect(
 			sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::begin())
@@ -1288,16 +1264,14 @@ CanvasView::create_display_bar()
 	displaybar->attach(*separator3,				7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*show_grid,				8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*snap_grid,				9,  10, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator4,				10,  11, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*separator4,				10, 11, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*past_onion_spin,		11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*onion_skin,				12, 13, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*future_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*render_options_button,	14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*preview_options_button,	15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator5,				16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*keyframedial,			17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*space,					18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
-	displaybar->attach(*animatebutton,			19, 20, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator5,				14, 15, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*keyframedial,			15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*space,					16, 17, 0, 1, Gtk::FILL, Gtk::FILL);
+	displaybar->attach(*animatebutton,			17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->show();
 
 	return displaybar;
@@ -1474,10 +1448,10 @@ CanvasView::init_menus()
 	action_group->add( Gtk::Action::create("import", _("Import")),
 		sigc::hide_return(sigc::mem_fun(*this, &studio::CanvasView::image_import))
 	);
-	action_group->add( Gtk::Action::create("render", _("Render")),
+	action_group->add( Gtk::Action::create("render", Gtk::StockID("synfig-render_options")),
 		sigc::mem_fun0(render_settings,&studio::RenderSettings::present)
 	);
-	action_group->add( Gtk::Action::create("preview", _("Preview")),
+	action_group->add( Gtk::Action::create("preview", Gtk::StockID("synfig-preview_options")),
 		sigc::mem_fun(*this,&CanvasView::on_preview_option)
 	);
 	action_group->add( Gtk::Action::create("sound", _("Sound File")),
@@ -1609,6 +1583,7 @@ CanvasView::init_menus()
 	action_group->add( Gtk::Action::create("play", Gtk::Stock::MEDIA_PLAY),
 		sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed)
 	);
+
 
 	action_group->add( Gtk::Action::create("dialog-flipbook", _("Preview Window")),
 		sigc::mem_fun0(*preview_dialog, &studio::Dialog_Preview::present)
