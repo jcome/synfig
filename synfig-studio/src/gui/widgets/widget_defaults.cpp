@@ -291,29 +291,6 @@ Widget_Defaults::Widget_Defaults()
 	attach(*widget_blend_method,0, 2, 2, 3, Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 1, 1);
 	widget_blend_method->set_tooltip_text(_("Default Blend Method"));
 
-	widget_interpolation=manage(new Widget_Enum());
-	widget_interpolation->set_size_request(0, -1);
-	widget_interpolation->show();
-	widget_interpolation->signal_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::on_interpolation_changed));
-	widget_interpolation->set_param_desc(
-		ParamDesc("interpolation")
-			.set_hint("enum")
-			.add_enum_value(INTERPOLATION_CLAMPED,"clamped",_("Clamped"))
-			.add_enum_value(INTERPOLATION_TCB,"auto",_("TCB"))
-			.add_enum_value(INTERPOLATION_CONSTANT,"constant",_("Constant"))
-			.add_enum_value(INTERPOLATION_HALT,"ease",_("Ease In/Out"))
-			.add_enum_value(INTERPOLATION_LINEAR,"linear",_("Linear"))
-	);
-	widget_interpolation->set_icon(0, Gtk::Button().render_icon(Gtk::StockID("synfig-interpolation_type_clamped"),Gtk::ICON_SIZE_MENU));
-	widget_interpolation->set_icon(1, Gtk::Button().render_icon(Gtk::StockID("synfig-interpolation_type_tcb"),Gtk::ICON_SIZE_MENU));
-	widget_interpolation->set_icon(2, Gtk::Button().render_icon(Gtk::StockID("synfig-interpolation_type_const"),Gtk::ICON_SIZE_MENU));
-	widget_interpolation->set_icon(3, Gtk::Button().render_icon(Gtk::StockID("synfig-interpolation_type_ease"),Gtk::ICON_SIZE_MENU));
-	widget_interpolation->set_icon(4, Gtk::Button().render_icon(Gtk::StockID("synfig-interpolation_type_linear"),Gtk::ICON_SIZE_MENU));
-	synfigapp::Main::set_interpolation(INTERPOLATION_CLAMPED); // Clamped by default.
-
-	attach(*widget_interpolation,0, 2, 5, 6, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 1, 1);
-	widget_interpolation->set_tooltip_text(_("Default Interpolation"));
-
 	widget_opacity=manage(new Gtk::HScale(0.0f,1.01f,0.01f));
 	widget_opacity->show();
 	widget_opacity->set_digits(2);
@@ -337,14 +314,12 @@ Widget_Defaults::Widget_Defaults()
 	synfigapp::Main::signal_fill_color_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::fill_color_refresh));
 	synfigapp::Main::signal_gradient_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::gradient_refresh));
 	synfigapp::Main::signal_blend_method_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::blend_method_refresh));
-	synfigapp::Main::signal_interpolation_changed().connect(sigc::mem_fun(*this,&studio::Widget_Defaults::interpolation_refresh));
 
 	otln_color_refresh();
 	fill_color_refresh();
 	gradient_refresh();
 	blend_method_refresh();
 	opacity_refresh();
-	interpolation_refresh();
 /*
 	set_size_request(48,48+GRADIENT_HEIGHT);
 	signal_expose_event().connect(sigc::mem_fun(*this, &studio::Widget_Defaults::redraw));
@@ -406,11 +381,6 @@ Widget_Defaults::blend_method_refresh()
 	widget_blend_method->set_value(synfigapp::Main::get_blend_method());
 }
 
-void
-Widget_Defaults::interpolation_refresh()
-{
-	widget_interpolation->set_value(synfigapp::Main::get_interpolation());
-}
 
 void
 Widget_Defaults::opacity_refresh()
@@ -430,11 +400,6 @@ Widget_Defaults::on_blend_method_changed()
 	synfigapp::Main::set_blend_method(Color::BlendMethod(widget_blend_method->get_value()));
 }
 
-void
-Widget_Defaults::on_interpolation_changed()
-{
-	synfigapp::Main::set_interpolation(Waypoint::Interpolation(widget_interpolation->get_value()));
-}
 
 void
 Widget_Defaults::on_bline_width_changed()
