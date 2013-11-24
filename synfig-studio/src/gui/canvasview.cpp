@@ -761,11 +761,13 @@ CanvasView::CanvasView(etl::loose_handle<Instance> instance,etl::handle<synfigap
 	Gtk::Table *layout_table= manage(new class Gtk::Table(5, 1, false));
 	//layout_table->attach(*vpaned, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
 	layout_table->attach(*create_work_area(),   0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_display_bar(), 0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+
 	init_menus();
+
+	layout_table->attach(*create_display_bar(), 0, 1, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	//layout_table->attach(*App::ui_manager()->get_widget("/menu-main"), 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_time_bar(),    0, 1, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_status_bar(),  0, 1, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	layout_table->attach(*create_time_bar(),    0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	layout_table->attach(*create_status_bar(),  0, 1, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 
 	update_title();
 
@@ -1009,16 +1011,6 @@ CanvasView::create_time_bar()
 	disp_audio->signal_stop_scrubbing().connect(
 		sigc::mem_fun(*audio,&AudioContainer::stop_scrubbing)
 	);
-	//Setup the current time widget
-	current_time_widget=manage(new Widget_Time);
-	current_time_widget->set_value(get_time());
-	current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
-	current_time_widget->signal_value_changed().connect(
-		sigc::mem_fun(*this,&CanvasView::on_current_time_widget_changed)
-	);
-	current_time_widget->set_size_request(0,-1); // request horizontal shrink
-	current_time_widget->set_tooltip_text(_("Current time"));
-	current_time_widget->show();
 
 	timebar = Gtk::manage(new class Gtk::Table(6, 3, false));
 
@@ -1033,11 +1025,11 @@ CanvasView::create_time_bar()
 
 	//Attach widgets to the timebar
 	//timebar->attach(*manage(disp_audio), 1, 5, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
-	timebar->attach(*current_time_widget, 0, 1, 0, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	timebar->attach(*framedial, 0, 2, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
+	//timebar->attach(*current_time_widget, 0, 1, 0, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	//timebar->attach(*framedial, 0, 2, 2, 3, Gtk::SHRINK, Gtk::SHRINK);
 	timebar->attach(*widget_kf_list, 1, 3, 0, 1, Gtk::FILL|Gtk::EXPAND, Gtk::FILL|Gtk::SHRINK);
 	timebar->attach(*timeslider, 1, 3, 1, 2, Gtk::FILL|Gtk::SHRINK, Gtk::FILL|Gtk::SHRINK);
-	timebar->attach(*time_window_scroll, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
+	//timebar->attach(*time_window_scroll, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
 
 	timebar->show();
 
@@ -1105,6 +1097,25 @@ CanvasView::create_display_bar()
 	displaybar = manage(new class Gtk::Table(1, 24, false));
 
 	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
+
+	// Setup the zoom widgets
+	ZoomDial *zoomdial=manage(new class ZoomDial(iconsize));
+	zoomdial->signal_zoom_in().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_in));
+	zoomdial->signal_zoom_out().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_out));
+	zoomdial->signal_zoom_fit().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_fit));
+	zoomdial->signal_zoom_norm().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_norm));
+	zoomdial->show();
+
+	// Setup the current time widget
+	current_time_widget=manage(new Widget_Time);
+	current_time_widget->set_value(get_time());
+	current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
+	current_time_widget->signal_value_changed().connect(
+		sigc::mem_fun(*this,&CanvasView::on_current_time_widget_changed)
+	);
+	current_time_widget->set_size_request(52, 24); // request horizontal shrink
+	current_time_widget->set_tooltip_text(_("Current time"));
+	current_time_widget->show();
 
 	// Setup the ToggleDuckDial widget
 	toggleducksdial = Gtk::manage(new class ToggleDucksDial(iconsize));
@@ -1254,24 +1265,26 @@ CanvasView::create_display_bar()
 	animatebutton->set_relief(Gtk::RELIEF_NONE);
 	animatebutton->show();
 
-	displaybar->attach(*framedial,				0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator0,				1,  2, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*toggleducksdial,		2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator1,				3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*resolutiondial,			4,  5, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator2,				5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*quality_spin,			6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator3,				7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*show_grid,				8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*snap_grid,				9,  10, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator4,				10, 11, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*past_onion_spin,		11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*onion_skin,				12, 13, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*future_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator5,				14, 15, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*keyframedial,			15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*space,					16, 17, 0, 1, Gtk::FILL, Gtk::FILL);
-	displaybar->attach(*animatebutton,			17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*zoomdial,			0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
+	displaybar->attach(*framedial,			2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*toggleducksdial,		4,  5, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator2,			7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*show_grid,			10, 11, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*snap_grid,			11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator4,			12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*onion_skin,			14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*separator5,			16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
+	displaybar->attach(*keyframedial,		17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+	displaybar->attach(*space,			18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
+	displaybar->attach(*animatebutton,		19, 20, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->show();
 
 	return displaybar;
