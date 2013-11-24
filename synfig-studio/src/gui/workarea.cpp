@@ -1098,26 +1098,12 @@ WorkArea::WorkArea(etl::loose_handle<synfigapp::CanvasInterface> canvas_interfac
 	menubutton->signal_pressed().connect(sigc::mem_fun(*this, &WorkArea::popup_menu));
 	attach(*menubutton, 0, 1, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0);
 
-	Gtk::HBox *hbox = manage(new class Gtk::HBox(false, 0));
-
 	Gtk::VScrollbar *vscrollbar1 = manage(new class Gtk::VScrollbar(*get_scrolly_adjustment()));
 	Gtk::HScrollbar *hscrollbar1 = manage(new class Gtk::HScrollbar(*get_scrollx_adjustment()));
+	hscrollbar1->show();
 	vscrollbar1->show();
 	attach(*vscrollbar1, 2, 3, 1, 2, Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
-
-	ZoomDial *zoomdial=manage(new class ZoomDial(iconsize));
-	zoomdial->signal_zoom_in().connect(sigc::mem_fun(*this, &studio::WorkArea::zoom_in));
-	zoomdial->signal_zoom_out().connect(sigc::mem_fun(*this, &studio::WorkArea::zoom_out));
-	zoomdial->signal_zoom_fit().connect(sigc::mem_fun(*this, &studio::WorkArea::zoom_fit));
-	zoomdial->signal_zoom_norm().connect(sigc::mem_fun(*this, &studio::WorkArea::zoom_norm));
-
-	hbox->pack_end(*hscrollbar1, Gtk::PACK_EXPAND_WIDGET,0);
-	hscrollbar1->show();
-	hbox->pack_start(*zoomdial, Gtk::PACK_SHRINK,0);
-	zoomdial->show();
-
-	attach(*hbox, 0, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	hbox->show();
+	attach(*hscrollbar1, 0, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 
 	drawing_area->add_events(Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
 	add_events(Gdk::KEY_PRESS_MASK);
