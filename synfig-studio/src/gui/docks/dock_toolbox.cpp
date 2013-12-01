@@ -37,21 +37,14 @@
 #include <gtk/gtk.h>
 #include <gtkmm/uimanager.h>
 
-#include <gtkmm/ruler.h>
-#include <gtkmm/arrow.h>
 #include <gtkmm/image.h>
 #include <gdkmm/pixbufloader.h>
 #include <gtkmm/viewport.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/scrolledwindow.h>
 #include <gtkmm/table.h>
-#include <gtkmm/statusbar.h>
-#include <gtkmm/menubar.h>
-#include <gtkmm/menu.h>
 #include <gtkmm/button.h>
-#include <gtkmm/toolbar.h>
 #include <gtkmm/box.h>
-#include <gtkmm/image.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/accelmap.h>
@@ -99,17 +92,6 @@ using namespace sigc;
 /* === P R O C E D U R E S ================================================= */
 
 /* === M E T H O D S ======================================================= */
-
-#define TOOLBOX_BUTTON(button,stockid,tooltip)	\
-	button = manage(new class Gtk::Button());	\
-	icon=manage(new Gtk::Image(Gtk::StockID(stockid),Gtk::IconSize(4)));	\
-	button->add(*icon);	\
-	button->set_tooltip_text(tooltip);	\
-	icon->show();	\
-	button->show()
-
-#define ADD_TOOLBOX_BUTTON(button,stockid,tooltip)	Gtk::Button *TOOLBOX_BUTTON(button,stockid,tooltip)
-
 
 Dock_Toolbox::Dock_Toolbox():
 	Dockable("toolbox",_("Toolbox"),Gtk::StockID("synfig-toolbox"))
