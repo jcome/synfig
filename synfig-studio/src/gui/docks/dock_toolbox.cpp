@@ -36,19 +36,12 @@
 
 #include <gtk/gtk.h>
 #include <gtkmm/uimanager.h>
-
-#include <gtkmm/image.h>
-#include <gdkmm/pixbufloader.h>
-#include <gtkmm/viewport.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/scrolledwindow.h>
 #include <gtkmm/table.h>
 #include <gtkmm/button.h>
 #include <gtkmm/box.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/handlebox.h>
 #include <gtkmm/accelmap.h>
-
 #include <gtkmm/inputdialog.h>
 
 #include <sigc++/signal.h>

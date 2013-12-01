@@ -29,12 +29,11 @@
 
 /* === H E A D E R S ======================================================= */
 
-#include "docks/dockable.h"
-
 #include <gtkmm/tooltip.h>
-#include <gtkmm/button.h>
 #include <gtkmm/togglebutton.h>
 #include <gtkmm/table.h>
+
+#include "docks/dockable.h"
 #include <synfig/string.h>
 #include "smach.h"
 #include <map>
