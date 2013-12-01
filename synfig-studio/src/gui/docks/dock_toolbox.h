@@ -59,9 +59,6 @@ class Dock_Toolbox : public Dockable
 {
 	friend class studio::StateManager;
 
-	Gtk::Button *button_undo;
-	Gtk::Button *button_redo;
-
 	Gtk::Table *tool_table;
 
 	std::map<synfig::String,Gtk::ToggleButton *> state_button_map;
