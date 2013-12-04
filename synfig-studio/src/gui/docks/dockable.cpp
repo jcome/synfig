@@ -108,7 +108,7 @@ Dockable::Dockable(const synfig::String& name,const synfig::String& local_name,G
 	//	event_box->set_events(Gdk::ALL_EVENTS_MASK); //!< \todo change this to only allow what is necessary for DnD
 
 
-		Gtk::Button* bttn_close(manage(new Gtk::Button(_("X"))));
+		Gtk::Button* bttn_close(manage(new Gtk::Button(_("x"))));
 		//table->attach(*bttn_close, 1, 2, 0,1, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 		header_box_.pack_end(*bttn_close,false,false);
 		bttn_close->show();
@@ -239,6 +239,7 @@ Dockable::set_toolbar(Gtk::Toolbar& toolbar)
 		attach(*toolbar_, 0, 1, 2,3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 		gtk_toolbar_set_icon_size(toolbar_->gobj(),GtkIconSize(1)/*GTK_ICON_SIZE_MENU*/);
 		toolbar_->show();
+		toolbar_->set_property("toolbar-style", Gtk::TOOLBAR_ICONS);
 	}
 }
 
