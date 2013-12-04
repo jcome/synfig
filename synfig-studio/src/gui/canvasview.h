@@ -215,6 +215,7 @@ public:
 	void set_grid_show_toggle(bool flag) { grid_show_toggle->set_active(flag); }
 	void set_onion_skin_toggle(bool flag) { onion_skin_toggle->set_active(flag); }
 
+
 	/*
  -- ** -- P R I V A T E   D A T A ---------------------------------------------
 	*/

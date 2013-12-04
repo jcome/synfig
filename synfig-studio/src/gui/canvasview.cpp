@@ -758,6 +758,9 @@ CanvasView::CanvasView(etl::loose_handle<Instance> instance,etl::handle<synfigap
 	//create all allocated stuff for this canvas
 	audio = new AudioContainer();
 
+	// Canvas window local toolbar
+	set_toolbar(*dynamic_cast<Gtk::Toolbar*>(App::ui_manager()->get_widget("/localtoolbar-canvas")));
+
 	Gtk::Table *layout_table= manage(new class Gtk::Table(5, 1, false));
 	//layout_table->attach(*vpaned, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
 	layout_table->attach(*create_work_area(),   0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0, 0);
@@ -1585,10 +1588,10 @@ CanvasView::init_menus()
 
 		Glib::RefPtr<Gtk::Action> action;
 
-		action=Gtk::Action::create("decrease-low-res-pixel-size", _("Decrease Low-Res Pixel Size"));
+		action=Gtk::Action::create("decrease-low-res-pixel-size", Gtk::StockID("decrease_resolution"));
 		action_group->add( action,sigc::mem_fun(this, &studio::CanvasView::decrease_low_res_pixel_size));
 
-		action=Gtk::Action::create("increase-low-res-pixel-size",  _("Increase Low-Res Pixel Size"));
+		action=Gtk::Action::create("increase-low-res-pixel-size",  Gtk::StockID("increase_resolution"));
 		action_group->add( action, sigc::mem_fun(this, &studio::CanvasView::increase_low_res_pixel_size));
 
 	}
@@ -1610,28 +1613,28 @@ CanvasView::init_menus()
 	{
 		Glib::RefPtr<Gtk::ToggleAction> action;
 
-		grid_show_toggle = Gtk::ToggleAction::create("toggle-grid-show", _("Show Grid"));
+		grid_show_toggle = Gtk::ToggleAction::create("toggle-grid-show", Gtk::StockID("synfig-toggle_show_grid"));
 		grid_show_toggle->set_active(work_area->grid_status());
 		action_group->add(grid_show_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_show_grid));
 
-		grid_snap_toggle = Gtk::ToggleAction::create("toggle-grid-snap", _("Snap to Grid"));
+		grid_snap_toggle = Gtk::ToggleAction::create("toggle-grid-snap",Gtk::StockID("synfig-toggle_snap_grid"));
 		grid_snap_toggle->set_active(work_area->get_grid_snap());
 		action_group->add(grid_snap_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_snap_grid));
 
-		action = Gtk::ToggleAction::create("toggle-guide-show", _("Show Guides"));
+		action = Gtk::ToggleAction::create("toggle-guide-show",Gtk::StockID("synfig-toggle_show_grid"));
 		action->set_active(work_area->get_show_guides());
 		action_group->add(action, sigc::mem_fun(*work_area, &studio::WorkArea::toggle_show_guides));
 
-		action = Gtk::ToggleAction::create("toggle-guide-snap", _("Snap to Guides"));
+		action = Gtk::ToggleAction::create("toggle-guide-snap", Gtk::StockID("synfig-toggle_show_grid"));
 		action->set_active(work_area->get_guide_snap());
 		action_group->add(action, sigc::mem_fun(*work_area, &studio::WorkArea::toggle_guide_snap));
 
 
-		action = Gtk::ToggleAction::create("toggle-low-res", _("Use Low-Res"));
+		action = Gtk::ToggleAction::create("toggle-low-res", Gtk::StockID("synfig-toggle_lowres"));
 		action->set_active(work_area->get_low_resolution_flag());
 		action_group->add(action, sigc::mem_fun(*this, &studio::CanvasView::toggle_low_res_pixel_flag));
 
-		onion_skin_toggle = Gtk::ToggleAction::create("toggle-onion-skin", _("Show Onion Skin"));
+		onion_skin_toggle = Gtk::ToggleAction::create("toggle-onion-skin", Gtk::StockID("synfig-toggle_onion_skin"));
 		onion_skin_toggle->set_active(work_area->get_onion_skin());
 		action_group->add(onion_skin_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_onion_skin));
 	}
@@ -1646,9 +1649,9 @@ CanvasView::init_menus()
 	{
 		Glib::RefPtr<Gtk::Action> action;
 
-		action=Gtk::Action::create("seek-next-frame", Gtk::Stock::GO_FORWARD,_("Next Frame"),_("Next Frame"));
+		action=Gtk::Action::create("seek-next-frame", Gtk::StockID("synfig-animate_seek_next_frame"),_("Next Frame"),_("Next Frame"));
 		action_group->add(action,sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame),1));
-		action=Gtk::Action::create("seek-prev-frame", Gtk::Stock::GO_BACK,_("Prev Frame"),_("Prev Frame"));
+		action=Gtk::Action::create("seek-prev-frame", Gtk::StockID("synfig-animate_seek_prev_frame"),_("Prev Frame"),_("Prev Frame"));
 		action_group->add( action, sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame),-1));
 
 		action=Gtk::Action::create("seek-next-second", Gtk::Stock::GO_FORWARD,_("Seek Forward"),_("Seek Forward"));
@@ -1656,16 +1659,16 @@ CanvasView::init_menus()
 		action=Gtk::Action::create("seek-prev-second", Gtk::Stock::GO_BACK,_("Seek Backward"),_("Seek Backward"));
 		action_group->add( action, sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time),Time(-1)));
 
-		action=Gtk::Action::create("seek-end", Gtk::Stock::GOTO_LAST,_("Seek to End"),_("Seek to End"));
+		action=Gtk::Action::create("seek-end", Gtk::StockID("synfig-animate_seek_end"),_("Seek to End"),_("Seek to End"));
 		action_group->add(action,sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time),Time::end()));
 
-		action=Gtk::Action::create("seek-begin", Gtk::Stock::GOTO_FIRST,_("Seek to Begin"),_("Seek to Begin"));
+		action=Gtk::Action::create("seek-begin", Gtk::StockID("synfig-animate_seek_begin"),_("Seek to Begin"));
 		action_group->add( action, sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time),Time::begin()));
 
-		action=Gtk::Action::create("jump-next-keyframe", Gtk::Stock::GO_FORWARD,_("Jump to Next Keyframe"),_("Jump to Next Keyframe"));
+		action=Gtk::Action::create("jump-next-keyframe", Gtk::StockID("synfig-animate_seek_next_keyframe"),_("Jump to Next Keyframe"),_("Jump to Next Keyframe"));
 		action_group->add( action,sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_next_keyframe));
 
-		action=Gtk::Action::create("jump-prev-keyframe", Gtk::Stock::GO_BACK,_("Jump to Prev Keyframe"),_("Jump to Prev Keyframe"));
+		action=Gtk::Action::create("jump-prev-keyframe", Gtk::StockID("synfig-animate_seek_prev_keyframe"),_("Jump to Prev Keyframe"));
 		action_group->add( action,sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_prev_keyframe));
 
 		action=Gtk::Action::create("canvas-zoom-in", Gtk::Stock::ZOOM_IN);
@@ -1693,16 +1696,16 @@ CanvasView::init_menus()
 				sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),		\
 				Duck::TYPE_##upper))
 
-		DUCK_MASK(position,POSITION,_("Show Position Handles"));
-		DUCK_MASK(tangent,TANGENT,_("Show Tangent Handles"));
-		DUCK_MASK(vertex,VERTEX,_("Show Vertex Handles"));
-		DUCK_MASK(radius,RADIUS,_("Show Radius Handles"));
-		DUCK_MASK(width,WIDTH,_("Show Width Handles"));
-		DUCK_MASK(angle,ANGLE,_("Show Angle Handles"));
+		DUCK_MASK(position,POSITION,Gtk::StockID("synfig-toggle_duck_position"));
+		DUCK_MASK(tangent,TANGENT,Gtk::StockID("synfig-toggle_duck_tangent"));
+		DUCK_MASK(vertex,VERTEX,Gtk::StockID("synfig-toggle_duck_vertex"));
+		DUCK_MASK(radius,RADIUS,Gtk::StockID("synfig-toggle_duck_radius"));
+		DUCK_MASK(width,WIDTH,Gtk::StockID("synfig-toggle_duck_width"));
+		DUCK_MASK(angle,ANGLE,Gtk::StockID("synfig-toggle_duck_angle"));
 		action_mask_bone_setup_ducks = action;
-		DUCK_MASK(bone-recursive,BONE_RECURSIVE,_("Show Recursive Scale Bone Handles"));
+		DUCK_MASK(bone-recursive,BONE_RECURSIVE,Gtk::StockID("synfig-toggle_duck_bone-recursive"));
 		action_mask_bone_recursive_ducks = action;
-		DUCK_MASK(widthpoint-position, WIDTHPOINT_POSITION, _("Show WidthPoints Position Handles"));
+		DUCK_MASK(widthpoint-position, WIDTHPOINT_POSITION, Gtk::StockID("synfig-toggle_duck_widthpoint-position"));
 
 #undef DUCK_MASK
 
