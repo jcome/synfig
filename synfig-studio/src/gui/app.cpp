@@ -852,7 +852,7 @@ init_ui_manager()
 	DEFINE_ACTION("import", _("Import"));
 	DEFINE_ACTION("render", Gtk::StockID("synfig-render_options"));
 	DEFINE_ACTION("preview", Gtk::StockID("synfig-preview_options"));
-	DEFINE_ACTION("dialog-flipbook", _("Preview Dialog"));
+	DEFINE_ACTION("dialog-flipbook", Gtk::StockID("synfig-preview_options"));
 	DEFINE_ACTION("sound", _("Sound File"));
 	DEFINE_ACTION("options", _("Options"));
 	DEFINE_ACTION("close", _("Close View"));
@@ -876,16 +876,21 @@ init_ui_manager()
 	DEFINE_ACTION("unselect-all-layers", _("Unselect All Layers"));
 	DEFINE_ACTION("properties", _("Properties"));
 
-	DEFINE_ACTION("mask-position-ducks", _("Show Position Handles"));
-	DEFINE_ACTION("mask-vertex-ducks", _("Show Vertex Handles"));
-	DEFINE_ACTION("mask-tangent-ducks", _("Show Tangent Handles"));
-	DEFINE_ACTION("mask-radius-ducks", _("Show Radius Handles"));
-	DEFINE_ACTION("mask-width-ducks", _("Show Width Handles"));
-	DEFINE_ACTION("mask-angle-ducks", _("Show Angle Handles"));
-	DEFINE_ACTION("mask-bone-setup-ducks", _("Show Bone Setup Handles"));
-	DEFINE_ACTION("mask-bone-recursive-ducks", _("Show Recursive Scale Bone Handles"));
-	DEFINE_ACTION("mask-bone-ducks", _("Next Bone Handles"));
-	DEFINE_ACTION("mask-widthpoint-position-ducks", _("Show WidthPoints Position Handles"));
+
+/* ///// Below actions are defined in canvasview.cpp, unused and should be removed later on
+
+
+	DEFINE_ACTION("mask-position-ducks", Gtk::StockID("synfig-toggle_duck_position"));
+	DEFINE_ACTION("mask-vertex-ducks", Gtk::StockID("synfig-toggle_duck_vertex"));
+	DEFINE_ACTION("mask-tangent-ducks", Gtk::StockID("synfig-toggle_duck_tangent"));
+	DEFINE_ACTION("mask-radius-ducks", Gtk::StockID("synfig-toggle_duck_radius"));
+	DEFINE_ACTION("mask-width-ducks", Gtk::StockID("synfig-toggle_duck_width"));
+	DEFINE_ACTION("mask-angle-ducks", Gtk::StockID("synfig-toggle_duck_angle"));
+	DEFINE_ACTION("mask-bone-setup-ducks", Gtk::StockID("synfig-toggle_duck_setup"));
+	DEFINE_ACTION("mask-bone-recursive-ducks", Gtk::StockID("synfig-toggle_duck_recursive"));
+	DEFINE_ACTION("mask-bone-ducks", Gtk::StockID("synfig-toggle_duck_bone"));
+	DEFINE_ACTION("mask-widthpoint-position-ducks", Gtk::StockID("synfig-toggle_duck_widthpoint"));
+
 	DEFINE_ACTION("quality-00", _("Use Parametric Renderer"));
 	DEFINE_ACTION("quality-01", _("Use Quality Level 1"));
 	DEFINE_ACTION("quality-02", _("Use Quality Level 2"));
@@ -902,10 +907,10 @@ init_ui_manager()
 	DEFINE_ACTION("play", _("Play"));
 	// DEFINE_ACTION("pause", _("Pause"));
 	DEFINE_ACTION("stop", _("Stop"));
-	DEFINE_ACTION("toggle-grid-show", _("Toggle Grid Show"));
-	DEFINE_ACTION("toggle-grid-snap", _("Toggle Grid Snap"));
-	DEFINE_ACTION("toggle-guide-show", _("Toggle Guide Show"));
-	DEFINE_ACTION("toggle-guide-snap", _("Toggle Guide Snap"));
+	DEFINE_ACTION("toggle-grid-show", Gtk::StockID("synfig-toggle_show_grid"));
+	DEFINE_ACTION("toggle-grid-snap", Gtk::StockID("synfig-toggle_snap_grid"));
+	DEFINE_ACTION("toggle-guide-show", Gtk::StockID("synfig-toggle_show_guide"));
+	DEFINE_ACTION("toggle-guide-snap", Gtk::StockID("synfig-toggle_snap_guide"));
 	DEFINE_ACTION("toggle-low-res", _("Toggle Low-Res"));
 	DEFINE_ACTION("decrease-low-res-pixel-size", _("Decrease Low-Res Pixel Size"));
 	DEFINE_ACTION("increase-low-res-pixel-size", _("Increase Low-Res Pixel Size"));
@@ -916,15 +921,15 @@ init_ui_manager()
 	DEFINE_ACTION("canvas-zoom-100", Gtk::StockID("gtk-zoom-100"));
 	DEFINE_ACTION("time-zoom-in", Gtk::StockID("gtk-zoom-in"));
 	DEFINE_ACTION("time-zoom-out", Gtk::StockID("gtk-zoom-out"));
-	DEFINE_ACTION("jump-next-keyframe", _("Jump to Next Keyframe"));
-	DEFINE_ACTION("jump-prev-keyframe", _("Jump to Prev Keyframe"));
-	DEFINE_ACTION("seek-next-frame", _("Next Frame"));
-	DEFINE_ACTION("seek-prev-frame", _("Prev Frame"));
+	DEFINE_ACTION("jump-next-keyframe", Gtk::StockID("synfig-animate_seek_next_frame"));
+	DEFINE_ACTION("jump-prev-keyframe", Gtk::StockID("synfig-animate_seek_prev_frame"));
+	DEFINE_ACTION("seek-next-frame", Gtk::StockID("synfig-animate_seek_next_frame"));
+	DEFINE_ACTION("seek-prev-frame", Gtk::StockID("synfig-animate_seek_prev_frame"));
 	DEFINE_ACTION("seek-next-second", _("Seek Forward"));
 	DEFINE_ACTION("seek-prev-second", _("Seek Backward"));
-	DEFINE_ACTION("seek-begin", _("Seek to Begin"));
-	DEFINE_ACTION("seek-end", _("Seek to End"));
-
+	DEFINE_ACTION("seek-begin", Gtk::StockID("synfig-animate_seek_begin"));
+	DEFINE_ACTION("seek-end", Gtk::StockID("synfig-animate_seek_next_end"));
+*/
 	DEFINE_ACTION("action-group_add", _("Add set"));
 
 	DEFINE_ACTION("canvas-new", _("New Canvas"));
@@ -1111,7 +1116,7 @@ init_ui_manager()
 "		<menuitem action='help-about'/>"
 "	</menu>";
 
-	Glib::ustring ui_info_tool =
+	Glib::ustring ui_info_main_tool =
 "		<toolitem action='new'/>"
 "		<toolitem action='open'/>"
 "		<toolitem action='save'/>"
@@ -1125,6 +1130,52 @@ init_ui_manager()
 "		<toolitem action='render'/>"
 "		<toolitem action='preview'/>";
 
+	Glib::ustring ui_info_canvas_tool =
+"		<toolitem action='canvas-zoom-out'/>"
+"		<toolitem action='canvas-zoom-in'/>"
+" 		<toolitem action='canvas-zoom-100'/>"
+"		<toolitem action='canvas-zoom-fit'/>"
+
+"		<separator name='sep-view1'/>"
+
+"		<toolitem action='seek-begin'/>"
+"		<toolitem action='seek-prev-frame'/>"
+"		<toolitem action='jump-prev-keyframe'/>"
+"		<toolitem action='play'/>"
+"		<toolitem action='stop'/>"
+"		<toolitem action='seek-next-frame'/>"
+"		<toolitem action='jump-next-keyframe'/>"
+"		<toolitem action='seek-end'/>"
+
+"		<separator name='sep-view2'/>"
+
+"		<toolitem action='mask-position-ducks'/>"
+"		<toolitem action='mask-vertex-ducks'/>"
+"		<toolitem action='mask-tangent-ducks'/>"
+"		<toolitem action='mask-radius-ducks'/>"
+"		<toolitem action='mask-width-ducks'/>"
+"		<toolitem action='mask-angle-ducks'/>"
+"		<toolitem action='mask-bone-setup-ducks'/>"
+"		<toolitem action='mask-bone-recursive-ducks'/>"
+"		<toolitem action='mask-bone-ducks'/>"
+"		<toolitem action='mask-widthpoint-position-ducks'/>"
+
+"		<separator name='sep-view3'/>"
+
+"		<toolitem action='toggle-onion-skin'/>"
+"		<toolitem action='toggle-grid-show'/>"
+"		<toolitem action='toggle-grid-snap'/>"
+"		<toolitem action='toggle-guide-show'/>"
+"		<toolitem action='toggle-guide-snap'/>"
+"		<toolitem action='toggle-low-res'/>"
+"		<toolitem action='toggle-onion-skin'/>"
+"		<toolitem action='decrease-low-res-pixel-size'/>"
+"		<toolitem action='increase-low-res-pixel-size'/>"
+
+"		<separator name='sep-view4'/>"
+
+"		<toolitem action='preview'/>";
+
 	Glib::ustring ui_info =
 "<ui>"
 "   <popup name='menu-toolbox' action='menu-toolbox'>"
@@ -1133,7 +1184,8 @@ init_ui_manager()
 "	</popup>"
 "	<popup name='menu-main' action='menu-main'>" + ui_info_menu + "</popup>"
 "	<menubar name='menubar-main' action='menubar-main'>" + ui_info_menu + "</menubar>"
-"	<toolbar name='toolbar-main'>" + ui_info_tool + "</toolbar>"
+"	<toolbar name='toolbar-main'>" + ui_info_main_tool + "</toolbar>"
+"	<toolbar name='localtoolbar-canvas'>" + ui_info_canvas_tool + "</toolbar>"
 "</ui>";
 
 	#undef DEFINE_ACTION
