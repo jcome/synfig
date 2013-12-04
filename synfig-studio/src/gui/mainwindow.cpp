@@ -110,6 +110,7 @@ MainWindow::MainWindow()
 	{
 		menubar->show();
 		vbox->pack_start(*toolbar, false, false, 0);
+		toolbar->set_property("toolbar-style", Gtk::TOOLBAR_ICONS);
 	}
 
 	vbox->pack_end(*bin_, true, true, 0);
