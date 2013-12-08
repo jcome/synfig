@@ -148,18 +148,6 @@ using namespace sigc;
 	button->show()
 #endif
 
-#ifndef NORMAL_BUTTON
-#define NORMAL_BUTTON(button,stockid,tooltip)	\
-	button = manage(new class Gtk::Button());	\
-	icon=manage(new Gtk::Image(Gtk::StockID(stockid),Gtk::ICON_SIZE_BUTTON));	\
-	button->add(*icon);	\
-	button->set_tooltip_text(tooltip);\
-	icon->set_padding(0,0);\
-	icon->show();	\
-	/*button->set_relief(Gtk::RELIEF_NONE);*/ \
-	button->show()
-#endif
-
 #define NEW_SMALL_BUTTON(x,y,z)	Gtk::Button *SMALL_BUTTON(x,y,z)
 
 #define NOT_IMPLEMENTED_SLOT sigc::mem_fun(*reinterpret_cast<studio::CanvasViewUIInterface*>(get_ui_interface().get()),&studio::CanvasViewUIInterface::not_implemented)
