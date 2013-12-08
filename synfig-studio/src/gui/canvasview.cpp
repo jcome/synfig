@@ -2425,6 +2425,7 @@ CanvasView::create_tab_label()
 			Gtk::StockID("gtk-close"),
 			Gtk::IconSize::from_name("synfig-small_icon") )));
 	close_button->add(*close_button_image);
+	close_button->set_relief(Gtk::RELIEF_NONE);
 	close_button->signal_clicked().connect(
 		sigc::hide_return(sigc::mem_fun(*this,&studio::CanvasView::close_view)));
 	close_button->set_relief(Gtk::RELIEF_NONE);
