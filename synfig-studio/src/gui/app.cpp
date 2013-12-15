@@ -804,6 +804,8 @@ init_ui_manager()
 
 	Glib::RefPtr<Gtk::ActionGroup> actions_action_group = Gtk::ActionGroup::create("actions");
 
+	Glib::RefPtr<Gtk::ActionGroup> canvastools_action_group = Gtk::ActionGroup::create("canvastools");
+
 	menus_action_group->add( Gtk::Action::create("menu-file", _("_File")) );
 	menus_action_group->add( Gtk::Action::create("menu-open-recent", _("Open Recent")) );
 	menus_action_group->add( Gtk::Action::create("menu-panels", _("Panels")) );
@@ -877,7 +879,7 @@ init_ui_manager()
 	DEFINE_ACTION("properties", _("Properties"));
 
 
-/* ///// Below actions are defined in canvasview.cpp, unused and should be removed later on
+ ///// Below actions are defined in canvasview.cpp, unused and should be removed later on
 
 
 	DEFINE_ACTION("mask-position-ducks", Gtk::StockID("synfig-toggle_duck_position"));
@@ -929,7 +931,7 @@ init_ui_manager()
 	DEFINE_ACTION("seek-prev-second", _("Seek Backward"));
 	DEFINE_ACTION("seek-begin", Gtk::StockID("synfig-animate_seek_begin"));
 	DEFINE_ACTION("seek-end", Gtk::StockID("synfig-animate_seek_next_end"));
-*/
+
 	DEFINE_ACTION("action-group_add", _("Add set"));
 
 	DEFINE_ACTION("canvas-new", _("New Canvas"));
@@ -2701,6 +2703,11 @@ App::open_as(std::string filename,std::string as,synfig::FileContainerZip::file_
 		}
 
 		etl::handle<synfig::Canvas> canvas(open_canvas_as(file_system->get_identifier(canvas_filename),as,errors,warnings));
+
+		// Init canvas window local toolbar
+		App::ui_manager_=studio::UIManager::create();
+		init_ui_manager();
+
 		if(canvas && get_instance(canvas))
 		{
 			get_instance(canvas)->find_canvas_view(canvas)->present();
@@ -2769,6 +2776,11 @@ App::open_from_temporary_container_as(std::string container_filename_base,std::s
 			throw (String)strprintf(_("Unable to open temporary container \"%s\"\n\n"),container_filename_base.c_str());
 
 		etl::handle<synfig::Canvas> canvas(open_canvas_as(file_system->get_identifier(canvas_filename),as,errors,warnings));
+
+		// Init canvas window local toolbar
+		App::ui_manager_=studio::UIManager::create();
+		init_ui_manager();
+
 		if(canvas && get_instance(canvas))
 		{
 			get_instance(canvas)->find_canvas_view(canvas)->present();
@@ -2821,6 +2833,10 @@ void
 App::new_instance()
 {
 	handle<synfig::Canvas> canvas=synfig::Canvas::create();
+
+	// Init canvas window localtoolbar
+	App::ui_manager_=studio::UIManager::create();
+	init_ui_manager();
 
 	String file_name(strprintf("%s%d", App::custom_filename_prefix.c_str(), Instance::get_count()+1));
 	canvas->set_name(file_name);
