@@ -378,6 +378,8 @@ private:
 	Glib::RefPtr<Gtk::ToggleAction> grid_show_toggle;
 	Glib::RefPtr<Gtk::ToggleAction> onion_skin_toggle;
 
+	Glib::RefPtr<Gtk::ToggleAction> past_keyframe_toggle;
+	Glib::RefPtr<Gtk::ToggleAction> furture_keyframe_toggle;
 	Glib::RefPtr<Gtk::ToggleAction> animate_mode_toggle;
 
 	Gtk::RadioButtonGroup quality_group;

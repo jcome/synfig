@@ -1147,7 +1147,6 @@ CanvasView::create_display_bar()
 	resolutiondial->show();
 
 	// Set up some separators
-
 	Gtk::VSeparator *separator0 = Gtk::manage(new class Gtk::VSeparator());
 	separator0->show();
 	Gtk::VSeparator *separator1 = Gtk::manage(new class Gtk::VSeparator());
@@ -1626,10 +1625,22 @@ CanvasView::init_menus()
 		onion_skin_toggle->set_active(work_area->get_onion_skin());
 		action_group->add(onion_skin_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_onion_skin));
 
-		// Animate mode toggle button
+
 		synfigapp::CanvasInterface::Mode mode;
+		// Past and furture keyframe lock buttons
+		// Past keyframe lock button
+		past_keyframe_toggle = Gtk::ToggleAction::create("toggle-past-keyframe-lock", Gtk::StockID("synfig-keyframe_lock_future_on"));
+		past_keyframe_toggle->set_active(mode&synfigapp::MODE_ANIMATE_PAST);
+		action_group->add(past_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe_button));
+
+		// Furture keyframe lock button
+		furture_keyframe_toggle = Gtk::ToggleAction::create("toggle-furture-keyframe-lock", Gtk::StockID("synfig-keyframe_lock_past_on"));
+		furture_keyframe_toggle->set_active(mode&synfigapp::MODE_ANIMATE_FUTURE);
+		action_group->add(furture_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe_button));
+
+		// Animate mode toggle button
 		animate_mode_toggle = Gtk::ToggleAction::create("toggle-animate-mode", Gtk::StockID("synfig-animate_mode_on"));
-		animate_mode_toggle->set_active(mode&synfigapp::MODE_ANIMATE);
+		animate_mode_toggle->set_active(!mode&synfigapp::MODE_ANIMATE);
 		action_group->add(animate_mode_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
 	}
 
@@ -2841,6 +2852,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		animatebutton->set_active(true);
+
+		// Update animate mode button state
+		animate_mode_toggle->set_active(true);
 	}
 	else
 	{
@@ -2852,6 +2866,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		animatebutton->set_active(false);
+
+		// Update animate mode button state
+		animate_mode_toggle->set_active(false);
 	}
 	//Keyframe lock icons
 	if(mode&synfigapp::MODE_ANIMATE_FUTURE)
@@ -2864,6 +2881,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		futurekeyframebutton->set_active(true);
+
+		// Update future keyframe button state
+		furture_keyframe_toggle->set_active(true);
 	}
 	else
 	{
@@ -2875,6 +2895,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		futurekeyframebutton->set_active(false);
+
+		// Update future keyframe button state
+		furture_keyframe_toggle->set_active(false);
 	}
 	if(mode&synfigapp::MODE_ANIMATE_PAST)
 	{
@@ -2886,6 +2909,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		pastkeyframebutton->set_active(true);
+
+		// Update past keyframe button state
+		past_keyframe_toggle->set_active(true);
 	}
 	else
 	{
@@ -2897,6 +2923,9 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 		icon->set_padding(0,0);
 		icon->show();
 		pastkeyframebutton->set_active(false);
+
+		// Update past keyframe button state
+		past_keyframe_toggle->set_active(false);
 	}
 
 	work_area->queue_draw();
