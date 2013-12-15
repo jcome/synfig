@@ -804,7 +804,7 @@ init_ui_manager()
 
 	Glib::RefPtr<Gtk::ActionGroup> actions_action_group = Gtk::ActionGroup::create("actions");
 
-	Glib::RefPtr<Gtk::ActionGroup> canvastools_action_group = Gtk::ActionGroup::create("canvastools");
+	Glib::RefPtr<Gtk::ActionGroup> canvastools_action_group = Gtk::ActionGroup::create("canvas-toolbar");
 
 	menus_action_group->add( Gtk::Action::create("menu-file", _("_File")) );
 	menus_action_group->add( Gtk::Action::create("menu-open-recent", _("Open Recent")) );
@@ -931,6 +931,7 @@ init_ui_manager()
 	DEFINE_ACTION("seek-prev-second", _("Seek Backward"));
 	DEFINE_ACTION("seek-begin", Gtk::StockID("synfig-animate_seek_begin"));
 	DEFINE_ACTION("seek-end", Gtk::StockID("synfig-animate_seek_next_end"));
+	DEFINE_ACTION("toggle-animate-mode", _("Animate Mode"));
 
 	DEFINE_ACTION("action-group_add", _("Add set"));
 
@@ -944,7 +945,7 @@ init_ui_manager()
 	DEFINE_ACTION("help-reference", _("Reference"));
 	DEFINE_ACTION("help-faq", _("Frequently Asked Questions"));
 	DEFINE_ACTION("help-support", _("Get Support"));
-	//DEFINE_ACTION("help-about", Gtk::StockID("synfig-about"));
+	DEFINE_ACTION("help-about", Gtk::StockID("synfig-about"));
 
   //Layout the actions in the main menu (caret menu, right click on canvas menu) and toolbar:
 	Glib::ustring ui_info_menu =
@@ -1176,7 +1177,9 @@ init_ui_manager()
 
 "		<separator name='sep-view4'/>"
 
-"		<toolitem action='preview'/>";
+"		<toolitem action='preview'/>"
+
+"		<toolitem action='toggle-animate-mode'/>";
 
 	Glib::ustring ui_info =
 "<ui>"

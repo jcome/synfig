@@ -1625,6 +1625,12 @@ CanvasView::init_menus()
 		onion_skin_toggle = Gtk::ToggleAction::create("toggle-onion-skin", Gtk::StockID("synfig-toggle_onion_skin"));
 		onion_skin_toggle->set_active(work_area->get_onion_skin());
 		action_group->add(onion_skin_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_onion_skin));
+
+		// Animate mode toggle button
+		synfigapp::CanvasInterface::Mode mode;
+		animate_mode_toggle = Gtk::ToggleAction::create("toggle-animate-mode", Gtk::StockID("synfig-animate_mode_on"));
+		animate_mode_toggle->set_active(mode&synfigapp::MODE_ANIMATE);
+		action_group->add(animate_mode_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
 	}
 
 	action_group->add( Gtk::Action::create("canvas-zoom-fit", Gtk::StockID("gtk-zoom-fit")),
