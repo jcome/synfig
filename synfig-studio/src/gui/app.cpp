@@ -931,6 +931,9 @@ init_ui_manager()
 	DEFINE_ACTION("seek-prev-second", _("Seek Backward"));
 	DEFINE_ACTION("seek-begin", Gtk::StockID("synfig-animate_seek_begin"));
 	DEFINE_ACTION("seek-end", Gtk::StockID("synfig-animate_seek_next_end"));
+
+	DEFINE_ACTION("toggle-past-keyframe-lock", _("Past Keyframe Lock"));
+	DEFINE_ACTION("toggle-furture-keyframe-lock", _("Furture Keyframe Lock"));
 	DEFINE_ACTION("toggle-animate-mode", _("Animate Mode"));
 
 	DEFINE_ACTION("action-group_add", _("Add set"));
@@ -1179,6 +1182,8 @@ init_ui_manager()
 
 "		<toolitem action='preview'/>"
 
+"		<toolitem action='toggle-past-keyframe-lock'/>"
+"		<toolitem action='toggle-furture-keyframe-lock'/>"
 "		<toolitem action='toggle-animate-mode'/>";
 
 	Glib::ustring ui_info =
