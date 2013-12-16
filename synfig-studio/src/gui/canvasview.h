@@ -299,10 +299,6 @@ private:
 	Gtk::Notebook *notebook; // not used
 	Gtk::Table *timebar;
 	Gtk::Table *displaybar;
-	Gtk::ToggleButton *animatebutton;
-	Gtk::Button *keyframebutton;
-	Gtk::ToggleButton *pastkeyframebutton;
-	Gtk::ToggleButton *futurekeyframebutton;
 	bool toggling_animate_mode_;
 	FrameDial *framedial;
 	ToggleDucksDial *toggleducksdial;
@@ -503,7 +499,7 @@ private:
 	void toggle_snap_grid();
 	void toggle_onion_skin();
 
-	void toggle_animatebutton();
+	void toggle_animate_mode();
 	void toggle_play();
 
 
@@ -753,8 +749,8 @@ private:
 	void on_animate_button_pressed();
 
 	void on_keyframe_button_pressed();
-	void toggle_past_keyframe_button();
-	void toggle_future_keyframe_button();
+	void toggle_past_keyframe();
+	void toggle_future_keyframe();
 
 	void on_preview_option();
 	void on_preview_create(const PreviewInfo &);
