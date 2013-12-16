@@ -1090,16 +1090,6 @@ CanvasView::create_display_bar()
 
 	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
 
-/*  Comment out to delete, since it is repleaced with toggle actoin
-	// Setup the zoom widgets
-	ZoomDial *zoomdial=manage(new class ZoomDial(iconsize));
-	zoomdial->signal_zoom_in().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_in));
-	zoomdial->signal_zoom_out().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_out));
-	zoomdial->signal_zoom_fit().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_fit));
-	zoomdial->signal_zoom_norm().connect(sigc::mem_fun(*work_area, &studio::WorkArea::zoom_norm));
-	zoomdial->show();
-
-*/
 	// Setup the current time widget
 	current_time_widget=manage(new Widget_Time);
 	current_time_widget->set_value(get_time());
@@ -1111,33 +1101,6 @@ CanvasView::create_display_bar()
 	current_time_widget->set_tooltip_text(_("Current time"));
 	current_time_widget->show();
 
-/* Comment out to delete, since it is repleaced with toggle actoin
-	// Setup the ToggleDuckDial widget
-	toggleducksdial = Gtk::manage(new class ToggleDucksDial(iconsize));
-
-	Duck::Type m = work_area->get_type_mask();
-	toggleducksdial->update_toggles(m);
-
-	toggleducksdial->signal_ducks_position().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_POSITION)
-			);
-	toggleducksdial->signal_ducks_vertex().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_VERTEX)
-			);
-	toggleducksdial->signal_ducks_tangent().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_TANGENT)
-			);
-	toggleducksdial->signal_ducks_radius().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_RADIUS)
-			);
-	toggleducksdial->signal_ducks_width().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_WIDTH)
-			);
-	toggleducksdial->signal_ducks_angle().connect(
-			sigc::bind(sigc::mem_fun(*this, &studio::CanvasView::toggle_duck_mask),Duck::TYPE_ANGLE)
-			);
-	toggleducksdial->show();
-*/
 	// Set up the ResolutionDial widget
 	resolutiondial=Gtk::manage(new class ResolutionDial(iconsize));
 
@@ -1174,47 +1137,6 @@ CanvasView::create_display_bar()
 	quality_spin->set_tooltip_text( _("Quality (lower is better)"));
 	quality_spin->show();
 
-/* Comment out to delete, since it is repleaced with toggle actoin
-	// Set up the show grid toggle button
-	show_grid = Gtk::manage(new class Gtk::ToggleButton());
-	show_grid->set_active(work_area->grid_status());
-	Gtk::Image *icon = manage(new Gtk::Image(Gtk::StockID("synfig-toggle_show_grid"), iconsize));
-	icon->set_padding(0, 0);
-	icon->show();
-	show_grid->add(*icon);
-	show_grid->signal_toggled().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::toggle_show_grid));
-	show_grid->set_tooltip_text( _("Show grid when enabled"));
-	show_grid->set_relief(Gtk::RELIEF_NONE);
-	show_grid->show();
-
-	// Set up the snap to grid toggle button
-	snap_grid = Gtk::manage(new class Gtk::ToggleButton());
-	snap_grid->set_active(work_area->grid_status());
-	Gtk::Image *icon2 = manage(new Gtk::Image(Gtk::StockID("synfig-toggle_snap_grid"), iconsize));
-	icon2->set_padding(0, 0);
-	icon2->show();
-	snap_grid->add(*icon2);
-	snap_grid->signal_toggled().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::toggle_snap_grid));
-	snap_grid->set_tooltip_text( _("Snap to grid when enabled"));
-	snap_grid->set_relief(Gtk::RELIEF_NONE);
-	snap_grid->show();
-
-
-	// Set up the onion skin toggle button
-	onion_skin = Gtk::manage(new class Gtk::ToggleButton());
-	onion_skin->set_active(work_area->get_onion_skin());
-	Gtk::Image *icon3 = manage(new Gtk::Image(Gtk::StockID("synfig-toggle_onion_skin"), iconsize));
-	icon3->set_padding(0, 0);
-	icon3->show();
-	onion_skin->add(*icon3);
-	onion_skin->signal_toggled().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::toggle_onion_skin));
-	onion_skin->set_tooltip_text( _("Shows onion skin when enabled"));
-	onion_skin->set_relief(Gtk::RELIEF_NONE);
-	onion_skin->show();
-*/
 	// Set up past onion skin spin button
 	past_onion_spin=Gtk::manage(new class Gtk::SpinButton(past_onion_adjustment_));
 	past_onion_spin->signal_value_changed().connect(
@@ -1229,36 +1151,15 @@ CanvasView::create_display_bar()
 	future_onion_spin->set_tooltip_text( _("Future onion skins"));
 	future_onion_spin->show();
 
-/* Comment out to delete, since it is repleaced with toggle actoin
-	framedial = manage(new class FrameDial());
-	framedial->signal_seek_begin().connect(
-			sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::begin())
-	);
-	framedial->signal_seek_prev_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_prev_keyframe));
-	framedial->signal_seek_prev_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), -1));
-	framedial->signal_play().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
-	framedial->signal_pause().connect(sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed));
-	framedial->signal_seek_next_frame().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_frame), 1));
-	framedial->signal_seek_next_keyframe().connect(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::jump_to_next_keyframe));
-	framedial->signal_seek_end().connect(sigc::bind(sigc::mem_fun(*canvas_interface().get(), &synfigapp::CanvasInterface::seek_time), Time::end()));
-	framedial->show();
-*/
-
-//	displaybar->attach(*zoomdial,			0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
-//	displaybar->attach(*framedial,			2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-//	displaybar->attach(*toggleducksdial,		4,  5, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator2,			7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-//	displaybar->attach(*show_grid,			10, 11, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-//	displaybar->attach(*snap_grid,			11, 12, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator4,			12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-//	displaybar->attach(*onion_skin,			14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator5,			16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*space,			18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
@@ -2824,32 +2725,37 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 {
 	if(toggling_animate_mode_)
 		return;
-	toggling_animate_mode_=true;
+	toggling_animate_mode_ = true;
 
 	// If the animate flag was set in mode...
 	if(mode&synfigapp::MODE_ANIMATE)
 	{
 		animate_mode_toggle->set_active(true);
 	}
+
 	else
 	{
 		animate_mode_toggle->set_active(false);
 	}
+
 	if(mode&synfigapp::MODE_ANIMATE_FUTURE)
 	{
 		// Update future keyframe button state
 		furture_keyframe_toggle->set_active(true);
 	}
+
 	else
 	{
 		// Update future keyframe button state
 		furture_keyframe_toggle->set_active(false);
 	}
+
 	if(mode&synfigapp::MODE_ANIMATE_PAST)
 	{
 		// Update past keyframe button state
 		past_keyframe_toggle->set_active(true);
 	}
+
 	else
 	{
 		// Update past keyframe button state
@@ -3143,10 +3049,7 @@ CanvasView::toggle_show_grid()
 	work_area->toggle_grid();
 	// Update the toggle grid show action
 	set_grid_show_toggle(work_area->grid_status());
-	
-	// Comment out, since show_grid button will be replaced with toggle action
-	// Update the toggle grid show check button
-	//show_grid->set_active(work_area->grid_status());
+
 	toggling_show_grid=false;
 }
 
@@ -3159,10 +3062,6 @@ CanvasView::toggle_snap_grid()
 	work_area->toggle_grid_snap();
 	// Update the toggle grid snap action
 	set_grid_snap_toggle(work_area->get_grid_snap());
-	
-	// Comment out, since it is replaced with toggle action
-	// Update the toggle grid snap check button
-	//snap_grid->set_active(work_area->get_grid_snap());
 	
 	toggling_snap_grid=false;
 }
@@ -3177,9 +3076,6 @@ CanvasView::toggle_onion_skin()
 	// Update the toggle onion skin action
 	set_onion_skin_toggle(work_area->get_onion_skin());
 	
-	// Comment out to make delete, since it is replaced with toggle action
-	// Update the toggle grid snap check button
-	//onion_skin->set_active(work_area->get_onion_skin());
 	toggling_onion_skin=false;
 }
 
@@ -3835,10 +3731,6 @@ CanvasView::toggle_duck_mask(Duckmatic::Type type)
 		action->set_active((bool)(work_area->get_type_mask()&Duck::TYPE_WIDTH));
 		action = Glib::RefPtr<Gtk::ToggleAction>::cast_dynamic(action_group->get_action("mask-angle-ducks"));
 		action->set_active((bool)(work_area->get_type_mask()&Duck::TYPE_ANGLE));
-
-		// comment out the update toggle ducks buttons, since it will be replaced with toggle actions
-		// Update toggle ducks buttons
-		//toggleducksdial->update_toggles(work_area->get_type_mask());
 	}
 	catch(...)
 	{
@@ -3887,12 +3779,6 @@ CanvasView::on_meta_data_changed()
 		action->set_active((bool)(work_area->grid_status()));
 		action = Glib::RefPtr<Gtk::ToggleAction>::cast_dynamic(action_group->get_action("toggle-grid-snap"));
 		action->set_active((bool)(work_area->get_grid_snap()));
-		
-		// Comment out, since they will be replaced with toggle actions
-		// Update the toggle buttons
-		//onion_skin->set_active(work_area->get_onion_skin());
-		//snap_grid->set_active(work_area->get_grid_snap());
-		//show_grid->set_active(work_area->grid_status());
 	}
 	catch(...)
 	{

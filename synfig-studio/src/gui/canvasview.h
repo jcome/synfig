@@ -300,8 +300,6 @@ private:
 	Gtk::Table *timebar;
 	Gtk::Table *displaybar;
 	bool toggling_animate_mode_;
-	FrameDial *framedial;
-	ToggleDucksDial *toggleducksdial;
 	bool toggling_ducks_;
 	ResolutionDial *resolutiondial;
 	bool changing_resolution_;
@@ -312,11 +310,7 @@ private:
 	Gtk::SpinButton *past_onion_spin;
 	Gtk::SpinButton *future_onion_spin;
 	bool updating_quality_;
-	Gtk::ToggleButton *show_grid;
-	Gtk::ToggleButton *snap_grid;
-	Gtk::ToggleButton *onion_skin;
-	Gtk::Button *render_options_button;
-	Gtk::Button *preview_options_button;
+
 	bool toggling_show_grid;
 	bool toggling_snap_grid;
 	bool toggling_onion_skin;
