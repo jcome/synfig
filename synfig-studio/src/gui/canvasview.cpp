@@ -1244,25 +1244,6 @@ CanvasView::create_display_bar()
 	framedial->show();
 */
 
-	//Setup the KeyFrameDial widget
-	KeyFrameDial *keyframedial = Gtk::manage(new class KeyFrameDial());
-	keyframedial->signal_toggle_keyframe_past().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe_button));
-	keyframedial->signal_toggle_keyframe_future().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe_button));
-	keyframedial->show();
-	pastkeyframebutton=keyframedial->get_toggle_pastbutton();
-	futurekeyframebutton=keyframedial->get_toggle_futurebutton();
-
-	//Setup the Animation Mode Button
-	Gtk::Image *icon6 = manage(new Gtk::Image(Gtk::StockID("synfig-animate_mode_off"), iconsize));
-	animatebutton = Gtk::manage(new class Gtk::ToggleButton());
-	animatebutton->set_tooltip_text(_("Turn on animate editing mode"));
-	icon6->set_padding(0,0);
-	icon6->show();
-	animatebutton->add(*icon6);
-	animatebutton->signal_toggled().connect(sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
-	animatebutton->set_relief(Gtk::RELIEF_NONE);
-	animatebutton->show();
-
 //	displaybar->attach(*zoomdial,			0,  1, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
 //	displaybar->attach(*framedial,			2,  3, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
@@ -1280,9 +1261,7 @@ CanvasView::create_display_bar()
 //	displaybar->attach(*onion_skin,			14, 15, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator5,			16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*keyframedial,		17, 18, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*space,			18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
-	displaybar->attach(*animatebutton,		19, 20, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->show();
 
 	return displaybar;
@@ -1637,17 +1616,17 @@ CanvasView::init_menus()
 		// Past keyframe lock button
 		past_keyframe_toggle = Gtk::ToggleAction::create("toggle-past-keyframe-lock", Gtk::StockID("synfig-keyframe_lock_future_on"));
 		past_keyframe_toggle->set_active(mode&synfigapp::MODE_ANIMATE_PAST);
-		action_group->add(past_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe_button));
+		action_group->add(past_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_past_keyframe));
 
 		// Furture keyframe lock button
 		furture_keyframe_toggle = Gtk::ToggleAction::create("toggle-furture-keyframe-lock", Gtk::StockID("synfig-keyframe_lock_past_on"));
 		furture_keyframe_toggle->set_active(mode&synfigapp::MODE_ANIMATE_FUTURE);
-		action_group->add(furture_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe_button));
+		action_group->add(furture_keyframe_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_future_keyframe));
 
 		// Animate mode toggle button
 		animate_mode_toggle = Gtk::ToggleAction::create("toggle-animate-mode", Gtk::StockID("synfig-animate_mode_on"));
 		animate_mode_toggle->set_active(!mode&synfigapp::MODE_ANIMATE);
-		action_group->add(animate_mode_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_animatebutton));
+		action_group->add(animate_mode_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_animate_mode));
 	}
 
 	action_group->add( Gtk::Action::create("canvas-zoom-fit", Gtk::StockID("gtk-zoom-fit")),
@@ -2846,90 +2825,33 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 	if(toggling_animate_mode_)
 		return;
 	toggling_animate_mode_=true;
+
 	// If the animate flag was set in mode...
-	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
 	if(mode&synfigapp::MODE_ANIMATE)
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-animate_mode_on"),iconsize));
-		animatebutton->remove();
-		animatebutton->add(*icon);
-		animatebutton->set_tooltip_text(_("Turn off animate editing mode"));
-		icon->set_padding(0,0);
-		icon->show();
-		animatebutton->set_active(true);
-
-		// Update animate mode button state
 		animate_mode_toggle->set_active(true);
 	}
 	else
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-animate_mode_off"),iconsize));
-		animatebutton->remove();
-		animatebutton->add(*icon);
-		animatebutton->set_tooltip_text(_("Turn on animate editing mode"));
-		icon->set_padding(0,0);
-		icon->show();
-		animatebutton->set_active(false);
-
-		// Update animate mode button state
 		animate_mode_toggle->set_active(false);
 	}
-	//Keyframe lock icons
 	if(mode&synfigapp::MODE_ANIMATE_FUTURE)
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-keyframe_lock_future_on"),iconsize));
-		futurekeyframebutton->remove();
-		futurekeyframebutton->add(*icon);
-		futurekeyframebutton->set_tooltip_text(_("Unlock future keyframes"));
-		icon->set_padding(0,0);
-		icon->show();
-		futurekeyframebutton->set_active(true);
-
 		// Update future keyframe button state
 		furture_keyframe_toggle->set_active(true);
 	}
 	else
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-keyframe_lock_future_off"),iconsize));
-		futurekeyframebutton->remove();
-		futurekeyframebutton->add(*icon);
-		futurekeyframebutton->set_tooltip_text(_("Lock future keyframes"));
-		icon->set_padding(0,0);
-		icon->show();
-		futurekeyframebutton->set_active(false);
-
 		// Update future keyframe button state
 		furture_keyframe_toggle->set_active(false);
 	}
 	if(mode&synfigapp::MODE_ANIMATE_PAST)
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-keyframe_lock_past_on"),iconsize));
-		pastkeyframebutton->remove();
-		pastkeyframebutton->add(*icon);
-		pastkeyframebutton->set_tooltip_text(_("Unlock past keyframes"));
-		icon->set_padding(0,0);
-		icon->show();
-		pastkeyframebutton->set_active(true);
-
 		// Update past keyframe button state
 		past_keyframe_toggle->set_active(true);
 	}
 	else
 	{
-		Gtk::Image *icon;
-		icon=manage(new Gtk::Image(Gtk::StockID("synfig-keyframe_lock_past_off"),iconsize));
-		pastkeyframebutton->remove();
-		pastkeyframebutton->add(*icon);
-		pastkeyframebutton->set_tooltip_text(_("Lock past  keyframes"));
-		icon->set_padding(0,0);
-		icon->show();
-		pastkeyframebutton->set_active(false);
-
 		// Update past keyframe button state
 		past_keyframe_toggle->set_active(false);
 	}
@@ -2939,7 +2861,7 @@ CanvasView::on_mode_changed(synfigapp::CanvasInterface::Mode mode)
 }
 
 void
-CanvasView::toggle_animatebutton()
+CanvasView::toggle_animate_mode()
 {
 	if(toggling_animate_mode_)
 		return;
@@ -2950,7 +2872,7 @@ CanvasView::toggle_animatebutton()
 }
 
 void
-CanvasView::toggle_past_keyframe_button()
+CanvasView::toggle_past_keyframe()
 {
 	if(toggling_animate_mode_)
 		return;
@@ -2962,7 +2884,7 @@ CanvasView::toggle_past_keyframe_button()
 }
 
 void
-CanvasView::toggle_future_keyframe_button()
+CanvasView::toggle_future_keyframe()
 {
 	if(toggling_animate_mode_)
 		return;
