@@ -214,6 +214,7 @@ public:
 	void set_grid_snap_toggle(bool flag) { grid_snap_toggle->set_active(flag); }
 	void set_grid_show_toggle(bool flag) { grid_show_toggle->set_active(flag); }
 	void set_onion_skin_toggle(bool flag) { onion_skin_toggle->set_active(flag); }
+	void set_play_toggle(bool flag) {play_toggle->set_active(flag); }
 
 
 	/*
@@ -323,6 +324,7 @@ private:
 	bool toggling_show_grid;
 	bool toggling_snap_grid;
 	bool toggling_onion_skin;
+	bool toggling_play;
 	//! Shows current time and allows edition
 	Widget_Time *current_time_widget;
 	void on_current_time_widget_changed();
@@ -374,6 +376,7 @@ private:
 	//! Menu members
 	Gtk::Menu parammenu;
 
+	Glib::RefPtr<Gtk::ToggleAction> play_toggle;
 	Glib::RefPtr<Gtk::ToggleAction> grid_snap_toggle;
 	Glib::RefPtr<Gtk::ToggleAction> grid_show_toggle;
 	Glib::RefPtr<Gtk::ToggleAction> onion_skin_toggle;
@@ -501,6 +504,7 @@ private:
 	void toggle_onion_skin();
 
 	void toggle_animatebutton();
+	void toggle_play();
 
 
 	/*

@@ -717,6 +717,7 @@ CanvasView::CanvasView(etl::loose_handle<Instance> instance,etl::handle<synfigap
 	toggling_show_grid=false;
 	toggling_snap_grid=false;
 	toggling_onion_skin=false;
+	toggling_play = false;
 
 	disp_audio = new Widget_Sound();
 
@@ -1590,11 +1591,6 @@ CanvasView::init_menus()
 
 	}
 
-	action_group->add( Gtk::Action::create("play", Gtk::Stock::MEDIA_PLAY),
-		sigc::mem_fun(*this, &studio::CanvasView::on_play_pause_pressed)
-	);
-
-
 	action_group->add( Gtk::Action::create("dialog-flipbook", Gtk::StockID("synfig-preview_window")),
 		sigc::mem_fun0(*preview_dialog, &studio::Dialog_Preview::present)
 	);
@@ -1632,6 +1628,9 @@ CanvasView::init_menus()
 		onion_skin_toggle->set_active(work_area->get_onion_skin());
 		action_group->add(onion_skin_toggle, sigc::mem_fun(*this, &studio::CanvasView::toggle_onion_skin));
 
+		action = Gtk::ToggleAction::create("toggle-play", Gtk::StockID("synfig-animate_play"));
+		action->set_active(toggling_play);
+		action_group->add(action, sigc::mem_fun(*this, &studio::CanvasView::toggle_play));
 
 		synfigapp::CanvasInterface::Mode mode;
 		// Past and furture keyframe lock buttons
@@ -3262,6 +3261,7 @@ CanvasView::toggle_onion_skin()
 	toggling_onion_skin=false;
 }
 
+
 void
 CanvasView::on_dirty_preview()
 {
@@ -4270,6 +4270,7 @@ CanvasView::on_delete_event(GdkEventAny* event __attribute__ ((unused)))
 	return true;
 }
 
+/* Comment out to delete, since now using toggle_play() instead.
 //! Modify the play stop button apearence and play stop the animation
 void
 CanvasView::on_play_pause_pressed()
@@ -4286,4 +4287,18 @@ CanvasView::on_play_pause_pressed()
 		// framedial->toggle_play_pause_button(is_playing());
 		stop();
 	}
+}
+*/
+
+// Toggle animation play
+void
+CanvasView::toggle_play()
+{
+	if (toggling_play)
+		return;
+	toggling_play = true;
+	play();
+	//set_play_toggle(is_playing()); // Update the toggle play action
+
+	toggling_play = false;
 }
