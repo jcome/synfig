@@ -908,7 +908,8 @@ init_ui_manager()
 	DEFINE_ACTION("quality-10", _("Use Quality Level 10"));
 	for(list<int>::iterator iter = CanvasView::get_pixel_sizes().begin(); iter != CanvasView::get_pixel_sizes().end(); iter++)
 		DEFINE_ACTION(strprintf("lowres-pixel-%d", *iter), strprintf(_("Set Low-Res pixel size to %d"), *iter));
-	DEFINE_ACTION("play", _("Play"));
+
+	DEFINE_ACTION("toggle-play", Gtk::StockID("synfig-animate_play"));
 	// DEFINE_ACTION("pause", _("Pause"));
 	DEFINE_ACTION("stop", _("Stop"));
 	DEFINE_ACTION("toggle-grid-show", Gtk::StockID("synfig-toggle_show_grid"));
@@ -1044,7 +1045,7 @@ init_ui_manager()
 	ui_info_menu +=
 "		</menu>"
 "		<separator name='sep-view1'/>"
-"		<menuitem action='play'/>"
+"		<menuitem action='toggle-play'/>"
 //"		<menuitem action='pause'/>"
 "		<menuitem action='stop'/>"
 "		<menuitem action='dialog-flipbook'/>"
@@ -1149,7 +1150,7 @@ init_ui_manager()
 "		<toolitem action='seek-begin'/>"
 "		<toolitem action='seek-prev-frame'/>"
 "		<toolitem action='jump-prev-keyframe'/>"
-"		<toolitem action='play'/>"
+"		<toolitem action='toggle-play'/>"
 "		<toolitem action='stop'/>"
 "		<toolitem action='seek-next-frame'/>"
 "		<toolitem action='jump-next-keyframe'/>"
@@ -1327,7 +1328,7 @@ init_ui_manager()
 	ACCEL2(Gtk::AccelKey('<', Gdk::CONTROL_MASK, "<Actions>/canvasview/seek-prev-second"));
 	ACCEL("<Mod1>o", "<Actions>/canvasview/toggle-onion-skin");
 	ACCEL("<Control><Shift>z", "<Actions>/canvasview/canvas-zoom-fit");
-	ACCEL("<Control>p", "<Actions>/canvasview/play");
+	ACCEL("<Control>p", "<Actions>/canvasview/toggle-play");
 	ACCEL("Home", "<Actions>/canvasview/seek-begin");
 	ACCEL("End", "<Actions>/canvasview/seek-end");
 
