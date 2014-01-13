@@ -756,10 +756,9 @@ CanvasView::CanvasView(etl::loose_handle<Instance> instance,etl::handle<synfigap
 
 	init_menus();
 
-	layout_table->attach(*create_display_bar(), 0, 1, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	//layout_table->attach(*App::ui_manager()->get_widget("/menu-main"), 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 	layout_table->attach(*create_time_bar(),    0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	layout_table->attach(*create_status_bar(),  0, 1, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	layout_table->attach(*create_status_bar(),  0, 1, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
 
 	update_title();
 
@@ -1083,94 +1082,6 @@ CanvasView::create_status_bar()
 	return statusbartable;
 }
 
-Gtk::Widget*
-CanvasView::create_display_bar()
-{
-	displaybar = manage(new class Gtk::Table(1, 24, false));
-
-	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
-
-	// Setup the current time widget
-/*	current_time_widget=manage(new Widget_Time);
-	current_time_widget->set_value(get_time());
-	current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
-	current_time_widget->signal_value_changed().connect(
-		sigc::mem_fun(*this,&CanvasView::on_current_time_widget_changed)
-	);
-	current_time_widget->set_size_request(52, 24); // request horizontal shrink
-	current_time_widget->set_tooltip_text(_("Current time"));
-	current_time_widget->show();
-*/
-
-	// Set up the ResolutionDial widget
-/*	resolutiondial=Gtk::manage(new class ResolutionDial(iconsize));
-
-	resolutiondial->update_lowres(work_area->get_low_resolution_flag());
-	resolutiondial->signal_increase_resolution().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::decrease_low_res_pixel_size));
-	resolutiondial->signal_decrease_resolution().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::increase_low_res_pixel_size));
-	resolutiondial->signal_use_low_resolution().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::toggle_low_res_pixel_flag));
-	resolutiondial->show();
-*/
-	// Set up some separators
-	Gtk::VSeparator *separator0 = Gtk::manage(new class Gtk::VSeparator());
-	separator0->show();
-	Gtk::VSeparator *separator1 = Gtk::manage(new class Gtk::VSeparator());
-	separator1->show();
-	Gtk::VSeparator *separator2 = Gtk::manage(new class Gtk::VSeparator());
-	separator2->show();
-	Gtk::VSeparator *separator3 = Gtk::manage(new class Gtk::VSeparator());
-	separator3->show();
-	Gtk::VSeparator *separator4 = Gtk::manage(new class Gtk::VSeparator());
-	separator4->show();
-	Gtk::VSeparator *separator5 = Gtk::manage(new class Gtk::VSeparator());
-	separator5->show();
-	Gtk::Alignment *space = Gtk::manage(new Gtk::Alignment());
-	space->set_size_request(8);
-	space->show();
-
-	// Set up quality spin button
-/*	quality_spin=Gtk::manage(new class Gtk::SpinButton(quality_adjustment_));
-	quality_spin->signal_value_changed().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::update_quality));
-	quality_spin->set_tooltip_text( _("Quality (lower is better)"));
-	quality_spin->show();
-*/
-
-	// Set up past onion skin spin button
-/*	past_onion_spin=Gtk::manage(new class Gtk::SpinButton(past_onion_adjustment_));
-	past_onion_spin->signal_value_changed().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::set_onion_skins));
-	past_onion_spin->set_tooltip_text( _("Past onion skins"));
-	past_onion_spin->show();
-*/
-	// Set up future onion skin spin button
-/*	future_onion_spin=Gtk::manage(new class Gtk::SpinButton(future_onion_adjustment_));
-	future_onion_spin->signal_value_changed().connect(
-			sigc::mem_fun(*this, &studio::CanvasView::set_onion_skins));
-	future_onion_spin->set_tooltip_text( _("Future onion skins"));
-	future_onion_spin->show();
-*/
-
-//	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
-	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-//	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator2,			7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-//	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*separator4,			12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-//	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-//	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*separator5,			16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*space,			18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
-	displaybar->show();
-
-	return displaybar;
-
-}
 
 void
 CanvasView::on_current_time_widget_changed()

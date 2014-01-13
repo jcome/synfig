@@ -466,8 +466,6 @@ private:
 
 	Gtk::Widget *create_time_bar();
 
-	Gtk::Widget *create_display_bar();
-
 	//! Pop up menu for the bezier (bline, draw) tool (?)
 	void popup_param_menu_bezier(float location, synfigapp::ValueDesc value_desc)
 	{ popup_param_menu(value_desc,location,true); }
