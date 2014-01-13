@@ -2080,7 +2080,10 @@ CanvasView::refresh_rend_desc()
 	}
 	else
 	{
-		show_timebar();
+		// always hide timebar, since we have timebar at timetrack panel. in the final design, timebar will like
+		// rulers, and should be call by user on demand. here I just hide for my ui toolbar implmentation temporaly.
+		hide_timebar();
+		// show_timebar();
 	}
 
 	//clamp time to big bounds...
