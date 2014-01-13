@@ -1102,7 +1102,7 @@ CanvasView::create_display_bar()
 	current_time_widget->show();
 
 	// Set up the ResolutionDial widget
-	resolutiondial=Gtk::manage(new class ResolutionDial(iconsize));
+/*	resolutiondial=Gtk::manage(new class ResolutionDial(iconsize));
 
 	resolutiondial->update_lowres(work_area->get_low_resolution_flag());
 	resolutiondial->signal_increase_resolution().connect(
@@ -1112,7 +1112,7 @@ CanvasView::create_display_bar()
 	resolutiondial->signal_use_low_resolution().connect(
 			sigc::mem_fun(*this, &studio::CanvasView::toggle_low_res_pixel_flag));
 	resolutiondial->show();
-
+*/
 	// Set up some separators
 	Gtk::VSeparator *separator0 = Gtk::manage(new class Gtk::VSeparator());
 	separator0->show();
@@ -1154,7 +1154,7 @@ CanvasView::create_display_bar()
 	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
 	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+//	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator2,			7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
