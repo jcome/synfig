@@ -1138,18 +1138,19 @@ CanvasView::create_display_bar()
 	quality_spin->show();
 
 	// Set up past onion skin spin button
-	past_onion_spin=Gtk::manage(new class Gtk::SpinButton(past_onion_adjustment_));
+/*	past_onion_spin=Gtk::manage(new class Gtk::SpinButton(past_onion_adjustment_));
 	past_onion_spin->signal_value_changed().connect(
 			sigc::mem_fun(*this, &studio::CanvasView::set_onion_skins));
 	past_onion_spin->set_tooltip_text( _("Past onion skins"));
 	past_onion_spin->show();
-
+*/
 	// Set up future onion skin spin button
-	future_onion_spin=Gtk::manage(new class Gtk::SpinButton(future_onion_adjustment_));
+/*	future_onion_spin=Gtk::manage(new class Gtk::SpinButton(future_onion_adjustment_));
 	future_onion_spin->signal_value_changed().connect(
 			sigc::mem_fun(*this, &studio::CanvasView::set_onion_skins));
 	future_onion_spin->set_tooltip_text( _("Future onion skins"));
 	future_onion_spin->show();
+*/
 
 	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
 	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
@@ -1159,8 +1160,8 @@ CanvasView::create_display_bar()
 	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*separator4,			12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
-	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+//	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+//	displaybar->attach(*future_onion_spin,		15, 16, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator5,			16, 17, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*space,			18, 19, 0, 1, Gtk::FILL, Gtk::FILL);
 	displaybar->show();
