@@ -1065,11 +1065,13 @@ CanvasView::create_status_bar()
 	statusbartable->attach(*refreshbutton, 3, 4, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0);
 	statusbartable->attach(*stopbutton, 4, 5, 0, 1, Gtk::SHRINK, Gtk::SHRINK, 0, 0);
 	statusbar->set_has_resize_grip(false);
-	statusbar->show();
-	stopbutton->show();
-	refreshbutton->show();
-	progressbar->show();
-	stopbutton->set_sensitive(false);
+
+	// hide statusbar temporaly, it will be replaced with a new widget placing in global toolbar in final design
+	// statusbar->show();
+	// stopbutton->show();
+	// refreshbutton->show();
+	// progressbar->show();
+	// stopbutton->set_sensitive(false);
 
 	//refreshbutton->signal_clicked().connect(sigc::mem_fun(*this, &studio::CanvasView::on_refresh_pressed));
 	//stopbutton->signal_clicked().connect(sigc::mem_fun(*this, &studio::CanvasView::stop));
@@ -1078,7 +1080,7 @@ CanvasView::create_status_bar()
 	refreshbutton->signal_clicked().connect(SLOT_EVENT(EVENT_REFRESH));
 	stopbutton->signal_clicked().connect(SLOT_EVENT(EVENT_STOP));
 
-	statusbartable->show_all();
+	// statusbartable->show_all();
 	return statusbartable;
 }
 
