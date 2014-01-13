@@ -1091,7 +1091,7 @@ CanvasView::create_display_bar()
 	Gtk::IconSize iconsize=Gtk::IconSize::from_name("synfig-small_icon_16x16");
 
 	// Setup the current time widget
-	current_time_widget=manage(new Widget_Time);
+/*	current_time_widget=manage(new Widget_Time);
 	current_time_widget->set_value(get_time());
 	current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
 	current_time_widget->signal_value_changed().connect(
@@ -1100,6 +1100,7 @@ CanvasView::create_display_bar()
 	current_time_widget->set_size_request(52, 24); // request horizontal shrink
 	current_time_widget->set_tooltip_text(_("Current time"));
 	current_time_widget->show();
+*/
 
 	// Set up the ResolutionDial widget
 /*	resolutiondial=Gtk::manage(new class ResolutionDial(iconsize));
@@ -1153,7 +1154,7 @@ CanvasView::create_display_bar()
 	future_onion_spin->show();
 */
 
-	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
+//	displaybar->attach(*current_time_widget,	1,  2, 0, 1, Gtk::SHRINK,Gtk::SHRINK);
 	displaybar->attach(*separator0,			3,  4, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 //	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
@@ -1180,8 +1181,10 @@ CanvasView::on_current_time_widget_changed()
 	// this was already being done elsewhere, but only if the time was really changed;
 	// if the current time was 6f and the user edited it to 6.1f, then the 6.1f would
 	// be left in the display without the following line to fix it
-	current_time_widget->set_value(get_time());
-	current_time_widget->set_position(-1); // leave the cursor at the end
+
+	// comment out current time widget temporaly
+	// current_time_widget->set_value(get_time());
+	// current_time_widget->set_position(-1); // leave the cursor at the end
 }
 
 //	Gtk::Widget*
@@ -2088,7 +2091,8 @@ CanvasView::workarea_layer_selected(synfig::Layer::Handle layer)
 void
 CanvasView::refresh_rend_desc()
 {
-	current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
+	// comment out current time widget temporaly
+	// current_time_widget->set_fps(get_canvas()->rend_desc().get_frame_rate());
 
 	//????
 	//synfig::info("Canvasview: Refreshing render desc info");
@@ -2627,12 +2631,18 @@ CanvasView::on_time_changed()
 {
 	Time time(get_time());
 
-	current_time_widget->set_value(time);
+	// comment out current time widget temporaly
+	// current_time_widget->set_value(time);
 	try {
 		get_canvas()->keyframe_list().find(time);
-		current_time_widget->modify_text(Gtk::STATE_NORMAL,Gdk::Color("#FF0000"));
+
+		// comment out current time widget temporaly
+		// current_time_widget->modify_text(Gtk::STATE_NORMAL,Gdk::Color("#FF0000"));
+
 	}catch(...){
-		current_time_widget->modify_text(Gtk::STATE_NORMAL,Gdk::Color("#000000"));
+
+		// comment out current time widget temporaly
+		// current_time_widget->modify_text(Gtk::STATE_NORMAL,Gdk::Color("#000000"));
 	}
 
 	if(get_time() != time_adjustment().get_value())
