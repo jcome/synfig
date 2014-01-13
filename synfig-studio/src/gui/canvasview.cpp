@@ -1131,11 +1131,12 @@ CanvasView::create_display_bar()
 	space->show();
 
 	// Set up quality spin button
-	quality_spin=Gtk::manage(new class Gtk::SpinButton(quality_adjustment_));
+/*	quality_spin=Gtk::manage(new class Gtk::SpinButton(quality_adjustment_));
 	quality_spin->signal_value_changed().connect(
 			sigc::mem_fun(*this, &studio::CanvasView::update_quality));
 	quality_spin->set_tooltip_text( _("Quality (lower is better)"));
 	quality_spin->show();
+*/
 
 	// Set up past onion skin spin button
 /*	past_onion_spin=Gtk::manage(new class Gtk::SpinButton(past_onion_adjustment_));
@@ -1157,7 +1158,7 @@ CanvasView::create_display_bar()
 	displaybar->attach(*separator1,			5,  6, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 //	displaybar->attach(*resolutiondial,		6,  7, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator2,			7,  8, 0, 1, Gtk::FILL, Gtk::FILL, 8);
-	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
+//	displaybar->attach(*quality_spin,		8,  9, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
 	displaybar->attach(*separator3,			9,  10, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 	displaybar->attach(*separator4,			12, 13, 0, 1, Gtk::FILL, Gtk::FILL, 8);
 //	displaybar->attach(*past_onion_spin,		13, 14, 0, 1, Gtk::SHRINK, Gtk::SHRINK);
