@@ -32,11 +32,9 @@
 #endif
 
 #include "dialogs/dialog_setup.h"
-#include "app.h"
 #include <gtkmm/scale.h>
 #include <gtkmm/table.h>
 #include <gtkmm/frame.h>
-#include <gtkmm/notebook.h>
 #include "widgets/widget_enum.h"
 #include "autorecover.h"
 
@@ -72,12 +70,12 @@ attach_label(Gtk::Table *table, String str, guint col, guint xpadding, guint ypa
 }
 
 Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
-	Dialog(_("Synfig Studio Setup"),parent,true),
-	adj_gamma_r(2.2,0.1,3.0,0.025,0.025,0.025),
-	adj_gamma_g(2.2,0.1,3.0,0.025,0.025,0.025),
-	adj_gamma_b(2.2,0.1,3.0,0.025,0.025,0.025),
-	adj_recent_files(15,1,50,1,1,0),
-	adj_undo_depth(100,10,5000,1,1,1),
+	Dialog(_("Preferences"),parent,true),
+	adj_gamma_r (2.2, 0.1, 3.0, 0.025, 0.025, 0.025),
+	adj_gamma_g (2.2, 0.1, 3.0, 0.025, 0.025, 0.025),
+	adj_gamma_b (2.2, 0.1, 3.0, 0.025, 0.025, 0.025),
+	adj_recent_files (15, 1, 50, 1, 1, 0),
+	adj_undo_depth (100, 10, 5000, 1, 1, 1),
 	toggle_use_colorspace_gamma(_("Visually Linear Color Selection")),
 #ifdef SINGLE_THREADED
 	toggle_single_threaded(_("Use Only a Single Thread")),
@@ -85,15 +83,21 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	toggle_restrict_radius_ducks(_("Restrict Real-Valued Handles to Top Right Quadrant")),
 	toggle_resize_imported_images(_("Scale New Imported Images to Fit Canvas")),
 	toggle_enable_experimental_features(_("Enable experimental features (restart required)")),
-	adj_pref_x_size(480,1,10000,1,10,0),
-	adj_pref_y_size(270,1,10000,1,10,0),
-	adj_pref_fps(24.0,1.0,100,0.1,1,0)
+	adj_pref_x_size (480, 1, 10000, 1, 10, 0),
+	adj_pref_y_size (270, 1, 10000, 1, 10, 0),
+	adj_pref_fps (24.0, 1.0, 100, 0.1, 1, 0),
+	pref_x_size_spinbutton (adj_pref_x_size, 1, 0),
+	pref_y_size_spinbutton (adj_pref_y_size, 1, 0),
+	pref_fps_spinbutton (adj_pref_fps, 1, 3)
+{
+	// Main preferences notebook
+	notebook.set_show_tabs (false);
+	notebook.set_show_border (false);
 
-	{
 	// Setup the buttons
 	Gtk::Button *restore_button(manage(new class Gtk::Button(_("Restore Defaults"))));
 	restore_button->show();
-	add_action_widget(*restore_button,1);
+	add_action_widget(*restore_button, 1);
 	restore_button->signal_clicked().connect(sigc::mem_fun(*this, &Dialog_Setup::on_restore_pressed));
 
 	Gtk::Button *cancel_button(manage(new class Gtk::Button(Gtk::StockID("gtk-cancel"))));
@@ -106,14 +110,12 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	add_action_widget(*ok_button,2);
 	ok_button->signal_clicked().connect(sigc::mem_fun(*this, &Dialog_Setup::on_ok_pressed));
 
-	// Notebook
-	Gtk::Notebook *notebook=manage(new class Gtk::Notebook());
-	get_vbox()->pack_start(*notebook);
 
+	/*********/
+	/* Gamma */
+	/*********/
 
-	// Gamma
 	Gtk::Table *gamma_table=manage(new Gtk::Table(2,2,false));
-	notebook->append_page(*gamma_table,_("Gamma"));
 
 	gamma_table->attach(gamma_pattern, 0, 2, 0, 1, Gtk::EXPAND, Gtk::SHRINK|Gtk::FILL, 0, 0);
 
@@ -141,25 +143,26 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	//red_blue_level_selector.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_red_blue_level_change));
 
 
-	// Misc
+	/********/
+	/* Misc */
+	/********/
+
 	Gtk::Table *misc_table=manage(new Gtk::Table(2,2,false));
-	notebook->append_page(*misc_table,_("Misc."));
 
 	int xpadding(8), ypadding(8);
 
 	// Misc - Timestamp
-	timestamp_menu=manage(new class Gtk::Menu());
 	attach_label(misc_table, _("Timestamp"), 0, xpadding, ypadding);
 	misc_table->attach(timestamp_optionmenu, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 
-#define ADD_TIMESTAMP(desc,x)									\
-	timestamp_menu->items().push_back(							\
-		Gtk::Menu_Helpers::MenuElem(							\
-			desc,												\
-			sigc::bind(											\
-				sigc::mem_fun(									\
-					*this,										\
-					&studio::Dialog_Setup::set_time_format),	\
+#define ADD_TIMESTAMP(desc,x) \
+	timestamp_menu.items().push_back( \
+		Gtk::Menu_Helpers::MenuElem( \
+			desc, \
+			sigc::bind( \
+				sigc::mem_fun( \
+					*this, \
+					&studio::Dialog_Setup::set_time_format), \
 				x)));
 	ADD_TIMESTAMP("HH:MM:SS.FF",		Time::FORMAT_VIDEO	);
 	ADD_TIMESTAMP("(HHh MMm SSs) FFf",	Time::FORMAT_NORMAL	);
@@ -167,9 +170,7 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	ADD_TIMESTAMP("HHh MMm SSs FFf",	Time::FORMAT_NORMAL	| Time::FORMAT_FULL		);
 	ADD_TIMESTAMP("HHhMMmSSsFFf",		Time::FORMAT_NORMAL	| Time::FORMAT_NOSPACES	| Time::FORMAT_FULL);
 	ADD_TIMESTAMP("FFf",				Time::FORMAT_FRAMES );
-
-	timestamp_optionmenu.set_menu(*timestamp_menu);
-
+	timestamp_optionmenu.set_menu(timestamp_menu);
 #undef ADD_TIMESTAMP
 
 	{
@@ -208,10 +209,10 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 
 	// Misc - resize_imported_images
 	misc_table->attach(toggle_resize_imported_images, 0, 2, 9, 10, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	
+
 	// Misc - enable_experimental_features
 	//misc_table->attach(toggle_enable_experimental_features, 0, 2, 10, 11, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	
+
 #ifdef SINGLE_THREADED
 	// Misc - single_threaded
 	misc_table->attach(toggle_single_threaded, 0, 2, 11, 12, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
@@ -221,9 +222,11 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	attach_label(misc_table, _("Browser Command"), 4, xpadding, ypadding);
 	misc_table->attach(textbox_browser_command, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 
-	// Document
+
+	/************/
+	/* Document */
+	/************/
 	Gtk::Table *document_table = manage(new Gtk::Table(2, 4, false));
-	notebook->append_page(*document_table, _("Document"));
 
 	// Document - Preferred file name prefix
 	attach_label(document_table, _("New Document filename prefix"), 0, xpadding, ypadding);
@@ -231,47 +234,43 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	textbox_custom_filename_prefix.set_tooltip_text( _("File name prefix for the new created document"));
 
 	// Document - New Document X size
-	pref_x_size_spinbutton = Gtk::manage(new Gtk::SpinButton(adj_pref_x_size, 1, 0));
 	attach_label(document_table, _("New Document X size"),1, xpadding, ypadding);
-	document_table->attach(*pref_x_size_spinbutton, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	pref_x_size_spinbutton->set_tooltip_text(_("Width in pixels of the new created document"));
+	document_table->attach(pref_x_size_spinbutton, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	pref_x_size_spinbutton.set_tooltip_text(_("Width in pixels of the new created document"));
 
 	// Document - New Document Y size
-	pref_y_size_spinbutton = Gtk::manage(new Gtk::SpinButton(adj_pref_y_size, 1, 0));
 	attach_label(document_table,_("New Document Y size"), 2, xpadding, ypadding);
-	document_table->attach(*pref_y_size_spinbutton, 1, 2, 2, 3,Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	pref_y_size_spinbutton->set_tooltip_text(_("High in pixels of the new created document"));
+	document_table->attach(pref_y_size_spinbutton, 1, 2, 2, 3,Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	pref_y_size_spinbutton.set_tooltip_text(_("High in pixels of the new created document"));
 
 	//Document - Template for predefined sizes of canvases.
-	size_template_combo = Gtk::manage(new Gtk::ComboBoxText());
 	Gtk::Label* label(manage(new Gtk::Label(_("Predefined Resolutions:"))));
 	label->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
 	document_table->attach(*label, 2, 3, 1, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	document_table->attach(*size_template_combo, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	size_template_combo->signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_size_template_combo_change));
-	size_template_combo->prepend_text(_("4096x3112 Full Aperture 4K"));
-	size_template_combo->prepend_text(_("2048x1556 Full Aperture Native 2K"));
-	size_template_combo->prepend_text(_("1920x1080 HDTV 1080p/i"));
-	size_template_combo->prepend_text(_("1280x720  HDTV 720p"));
-	size_template_combo->prepend_text(_("720x576   DVD PAL"));
-	size_template_combo->prepend_text(_("720x480   DVD NTSC"));
-	size_template_combo->prepend_text(_("720x540   Web 720x"));
-	size_template_combo->prepend_text(_("720x405   Web 720x HD"));
-	size_template_combo->prepend_text(_("640x480   Web 640x"));
-	size_template_combo->prepend_text(_("640x360   Web 640x HD"));
-	size_template_combo->prepend_text(_("480x360   Web 480x"));
-	size_template_combo->prepend_text(_("480x270   Web 480x HD"));
-	size_template_combo->prepend_text(_("360x270   Web 360x"));
-	size_template_combo->prepend_text(_("360x203   Web 360x HD"));
-	size_template_combo->prepend_text(DEFAULT_PREDEFINED_SIZE);
+	document_table->attach(size_template_combo, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	size_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_size_template_combo_change));
+	size_template_combo.prepend_text(_("4096x3112 Full Aperture 4K"));
+	size_template_combo.prepend_text(_("2048x1556 Full Aperture Native 2K"));
+	size_template_combo.prepend_text(_("1920x1080 HDTV 1080p/i"));
+	size_template_combo.prepend_text(_("1280x720  HDTV 720p"));
+	size_template_combo.prepend_text(_("720x576   DVD PAL"));
+	size_template_combo.prepend_text(_("720x480   DVD NTSC"));
+	size_template_combo.prepend_text(_("720x540   Web 720x"));
+	size_template_combo.prepend_text(_("720x405   Web 720x HD"));
+	size_template_combo.prepend_text(_("640x480   Web 640x"));
+	size_template_combo.prepend_text(_("640x360   Web 640x HD"));
+	size_template_combo.prepend_text(_("480x360   Web 480x"));
+	size_template_combo.prepend_text(_("480x270   Web 480x HD"));
+	size_template_combo.prepend_text(_("360x270   Web 360x"));
+	size_template_combo.prepend_text(_("360x203   Web 360x HD"));
+	size_template_combo.prepend_text(DEFAULT_PREDEFINED_SIZE);
 
 	//Document - Template for predefined fps
-	fps_template_combo = Gtk::manage(new Gtk::ComboBoxText());
 	Gtk::Label* label1(manage(new Gtk::Label(_("Predefined FPS:"))));
 	label1->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
 	document_table->attach(*label1, 2, 3, 3, 4, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	document_table->attach(*fps_template_combo,2, 3, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	fps_template_combo->signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_fps_template_combo_change));
+	document_table->attach(fps_template_combo,2, 3, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	fps_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_fps_template_combo_change));
 	//Document - Fill the FPS combo box with proper strings (not localised)
 	float f[8];
 	f[0] = 60;
@@ -283,19 +282,20 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	f[6] = 15;
 	f[7] = 12;
 	for (int i=0; i<8; i++)
-		fps_template_combo->prepend_text(strprintf("%5.3f", f[i]));
+		fps_template_combo.prepend_text(strprintf("%5.3f", f[i]));
 
-	fps_template_combo->prepend_text(DEFAULT_PREDEFINED_FPS);
+	fps_template_combo.prepend_text(DEFAULT_PREDEFINED_FPS);
 
 	// Document - New Document FPS
-	pref_fps_spinbutton = Gtk::manage(new Gtk::SpinButton(adj_pref_fps, 1, 3));
 	attach_label(document_table,_("New Document FPS"), 4, xpadding, ypadding);
-	document_table->attach(*pref_fps_spinbutton, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	pref_fps_spinbutton->set_tooltip_text(_("Frames per second of the new created document"));
+	document_table->attach(pref_fps_spinbutton, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	pref_fps_spinbutton.set_tooltip_text(_("Frames per second of the new created document"));
 
-	// Render - Table
+
+	/**********/
+	/* Render */
+	/**********/
 	Gtk::Table *render_table = manage(new Gtk::Table(2, 4, false));
-	notebook->append_page(*render_table, _("Render"));
 
 	// Render - Image sequence separator
 	attach_label(render_table, _("Image Sequence Separator String"), 0, xpadding, ypadding);
@@ -306,13 +306,74 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	// Render - Use Cairo on WorkArea
 	attach_label(render_table, _("Use Cairo render on WorkArea"), 2, xpadding, ypadding);
 	render_table->attach(toggle_workarea_uses_cairo, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	
+
+	gamma_table->show_all();
+	misc_table->show_all();
+	document_table->show_all();
+	render_table->show_all();
+
+	notebook.append_page(*gamma_table,_("Gamma"));
+	notebook.append_page(*misc_table,_("Misc."));
+	notebook.append_page(*document_table, _("Document"));
+	notebook.append_page(*render_table, _("Render"));
+
+
+	/*******************/
+	/* Categories List */
+	/*******************/
+  prefs_categories_reftreemodel = Gtk::TreeStore::create(prefs_categories);
+  prefs_categories_treeview.set_model(prefs_categories_reftreemodel);
+
+  Gtk::TreeModel::Row row = *(prefs_categories_reftreemodel->append());
+  row[prefs_categories.category_id] = 0;
+  row[prefs_categories.category_name] = "Gamma";
+
+	row = *(prefs_categories_reftreemodel->append());
+  row[prefs_categories.category_id] = 1;
+  row[prefs_categories.category_name] = "Misc";
+
+  row = *(prefs_categories_reftreemodel->append());
+  row[prefs_categories.category_id] = 2;
+  row[prefs_categories.category_name] = "Document";
+
+  row = *(prefs_categories_reftreemodel->append());
+  row[prefs_categories.category_id] = 3;
+  row[prefs_categories.category_name] = "Render";
+
+  row = *(prefs_categories_reftreemodel->append());
+  row[prefs_categories.category_id] = 4;
+  row[prefs_categories.category_name] = "System";
+
+  Gtk::TreeModel::Row childrow = *(prefs_categories_reftreemodel->append(row.children()));
+  childrow[prefs_categories.category_id] = 5;
+  childrow[prefs_categories.category_name] = "Advanced";
+
+  prefs_categories_treeview.append_column("Category", prefs_categories.category_name);
+  prefs_categories_treeview.expand_all();
+
+  prefs_categories_treeview.signal_row_activated().connect(sigc::mem_fun(*this,
+																														&Dialog_Setup::on_treeview_row_activated));
+
+	prefs_categories_scrolledwindow.add(prefs_categories_treeview);
+	prefs_categories_scrolledwindow.set_size_request(-1, 80);
+	prefs_categories_scrolledwindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+
+	setup_dialog_hbox.pack_start(prefs_categories_scrolledwindow);
+	notebook.show_all();
+
+	setup_dialog_hbox.pack_start(notebook);
+	setup_dialog_hbox.set_border_width(6);
+
+	get_vbox()->pack_start(setup_dialog_hbox);
+	get_vbox()->set_border_width(12);
 	show_all_children();
 }
+
 
 Dialog_Setup::~Dialog_Setup()
 {
 }
+
 
 void
 Dialog_Setup::on_ok_pressed()
@@ -325,7 +386,7 @@ Dialog_Setup::on_ok_pressed()
 void
 Dialog_Setup::on_restore_pressed()
 {
-    App::restore_default_settings();
+	App::restore_default_settings();
 	hide();
 }
 
@@ -375,10 +436,10 @@ Dialog_Setup::on_apply_pressed()
 	App::preferred_y_size=int(adj_pref_y_size.get_value());
 
 	// Set the preferred Predefined size
-	App::predefined_size=size_template_combo->get_active_text();
+	App::predefined_size=size_template_combo.get_active_text();
 
 	// Set the preferred Predefined fps
-	App::predefined_fps=fps_template_combo->get_active_text();
+	App::predefined_fps=fps_template_combo.get_active_text();
 
 	// Set the preferred FPS
 	App::preferred_fps=Real(adj_pref_fps.get_value());
@@ -441,11 +502,11 @@ Dialog_Setup::on_red_blue_level_change()
 void
 Dialog_Setup::on_size_template_combo_change()
 {
-	String selection(size_template_combo->get_active_text());
+	String selection(size_template_combo.get_active_text());
 	if(selection==DEFAULT_PREDEFINED_SIZE)
 	{
-		pref_y_size_spinbutton->set_sensitive(true);
-		pref_x_size_spinbutton->set_sensitive(true);
+		pref_y_size_spinbutton.set_sensitive(true);
+		pref_x_size_spinbutton.set_sensitive(true);
 		return;
 	}
 	String::size_type locx=selection.find_first_of("x"); // here should be some comparison with string::npos
@@ -456,8 +517,8 @@ Dialog_Setup::on_size_template_combo_change()
 	int y=atoi(y_size.c_str());
 	adj_pref_x_size.set_value(x);
 	adj_pref_y_size.set_value(y);
-	pref_y_size_spinbutton->set_sensitive(false);
-	pref_x_size_spinbutton->set_sensitive(false);
+	pref_y_size_spinbutton.set_sensitive(false);
+	pref_x_size_spinbutton.set_sensitive(false);
 
 	return;
 }
@@ -465,14 +526,14 @@ Dialog_Setup::on_size_template_combo_change()
 void
 Dialog_Setup::on_fps_template_combo_change()
 {
-	String selection(fps_template_combo->get_active_text());
+	String selection(fps_template_combo.get_active_text());
 	if(selection==DEFAULT_PREDEFINED_FPS)
 	{
-		pref_fps_spinbutton->set_sensitive(true);
+		pref_fps_spinbutton.set_sensitive(true);
 		return;
 	}
 	adj_pref_fps.set_value(atof(selection.c_str()));
-	pref_fps_spinbutton->set_sensitive(false);
+	pref_fps_spinbutton.set_sensitive(false);
 	return;
 }
 
@@ -535,13 +596,13 @@ Dialog_Setup::refresh()
 	adj_pref_y_size.set_value(App::preferred_y_size);
 
 	// Refresh the preferred Predefined size
-	size_template_combo->set_active_text(App::predefined_size);
+	size_template_combo.set_active_text(App::predefined_size);
 
 	//Refresh the preferred FPS
 	adj_pref_fps.set_value(App::preferred_fps);
 
 	//Refresh the predefined FPS
-	fps_template_combo->set_active_text(App::predefined_fps);
+	fps_template_combo.set_active_text(App::predefined_fps);
 
 	//Refresh the sequence separator
 	image_sequence_separator.set_text(App::sequence_separator);
@@ -729,7 +790,6 @@ BlackLevelSelector::redraw(GdkEventExpose */*bleh*/)
 }
 
 
-
 bool
 BlackLevelSelector::on_event(GdkEvent *event)
 {
@@ -785,20 +845,6 @@ Dialog_Setup::set_time_format(synfig::Time::Format x)
 	else
 		timestamp_optionmenu.set_history(1);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 RedBlueLevelSelector::RedBlueLevelSelector()
@@ -902,4 +948,17 @@ RedBlueLevelSelector::on_event(GdkEvent *event)
 	}
 
 	return false;
+}
+
+
+void Dialog_Setup::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* column */)
+{
+
+  Gtk::TreeModel::iterator iter = prefs_categories_reftreemodel->get_iter(path);
+  if(iter)
+  {
+    Gtk::TreeModel::Row row = *iter;
+    notebook.set_current_page((int)row[prefs_categories.category_id]);
+	}
+
 }

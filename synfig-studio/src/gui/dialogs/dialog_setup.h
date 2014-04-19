@@ -30,23 +30,26 @@
 /* === H E A D E R S ======================================================= */
 
 #include <gtk/gtk.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/table.h>
-#include <gtkmm/button.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/notebook.h>
+#include <gtkmm/scrolledwindow.h>
 #include <gtkmm/drawingarea.h>
-#include <gtkmm/optionmenu.h>
-#include <gtkmm/checkbutton.h>
-#include <gui/widgets/widget_time.h>
-#include <gtkmm/tooltip.h>
-#include <gtkmm/comboboxtext.h>
-#include <gtkmm/spinbutton.h>
+#include <gtkmm/treeview.h>
+#include <gtkmm/treestore.h>
 
+#include <gtkmm/optionmenu.h>
+#include <gtkmm/button.h>
+#include <gtkmm/checkbutton.h>
+#include <gtkmm/spinbutton.h>
+#include <gtkmm/adjustment.h>
+#include <gtkmm/comboboxtext.h>
+
+#include <gui/widgets/widget_time.h>
 #include <synfig/gamma.h>
 #include <synfig/time.h>
-#include <algorithm>
-
 #include "app.h"
+
+#include <algorithm>
 
 /* === M A C R O S ========================================================= */
 #ifndef DEFAULT_PREDEFINED_SIZE
@@ -103,6 +106,7 @@ public:
 	bool redraw(GdkEventExpose*bleh=NULL);
 }; // END of class GammaPattern
 
+
 class BlackLevelSelector : public Gtk::DrawingArea
 {
 	float level;
@@ -125,6 +129,7 @@ public:
 
 	bool on_event(GdkEvent *event);
 }; // END of class BlackLevelSelector
+
 
 class RedBlueLevelSelector : public Gtk::DrawingArea
 {
@@ -149,6 +154,7 @@ public:
 	bool on_event(GdkEvent *event);
 }; // END of class RedBlueSelector
 
+
 class Widget_Enum;
 
 class Dialog_Setup : public Gtk::Dialog
@@ -166,49 +172,71 @@ class Dialog_Setup : public Gtk::Dialog
 	void on_size_template_combo_change();
 	void on_fps_template_combo_change();
 
+	Gtk::Notebook notebook;
 	GammaPattern gamma_pattern;
 	BlackLevelSelector black_level_selector;
 	RedBlueLevelSelector red_blue_level_selector;
 	Gtk::OptionMenu timestamp_optionmenu;
-
 	Gtk::Adjustment adj_gamma_r;
 	Gtk::Adjustment adj_gamma_g;
 	Gtk::Adjustment adj_gamma_b;
-
 	Gtk::Adjustment adj_recent_files;
 	Gtk::Adjustment adj_undo_depth;
-
 	Gtk::CheckButton toggle_use_colorspace_gamma;
 #ifdef SINGLE_THREADED
 	Gtk::CheckButton toggle_single_threaded;
 #endif
-
-	synfig::Time::Format time_format;
-
-	Gtk::Menu *timestamp_menu;
+	Gtk::Menu timestamp_menu;
 	Widget_Enum *widget_enum;
-
 	Widget_Time auto_backup_interval;
-
 	Gtk::CheckButton toggle_restrict_radius_ducks;
 	Gtk::CheckButton toggle_resize_imported_images;
 	Gtk::CheckButton toggle_enable_experimental_features;
-
 	Gtk::Entry textbox_browser_command;
-
-	Gtk::ComboBoxText* size_template_combo;
-	Gtk::ComboBoxText* fps_template_combo;
+	Gtk::ComboBoxText size_template_combo;
+	Gtk::ComboBoxText fps_template_combo;
 	Gtk::Entry textbox_custom_filename_prefix;
 	Gtk::Adjustment adj_pref_x_size;
 	Gtk::Adjustment adj_pref_y_size;
 	Gtk::Adjustment adj_pref_fps;
-	Gtk::SpinButton* pref_fps_spinbutton;
-	Gtk::SpinButton* pref_y_size_spinbutton;
-	Gtk::SpinButton* pref_x_size_spinbutton;
-
+	Gtk::SpinButton pref_fps_spinbutton;
+	Gtk::SpinButton pref_y_size_spinbutton;
+	Gtk::SpinButton pref_x_size_spinbutton;
 	Gtk::Entry image_sequence_separator;
 	Gtk::CheckButton toggle_navigator_uses_cairo;
 	Gtk::CheckButton toggle_workarea_uses_cairo;
+	synfig::Time::Format time_format;
+
+
+
+protected:
+  //Signal handlers:
+	void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
+
+
+
+  //Tree model columns:
+  class PrefsCategories : public Gtk::TreeModel::ColumnRecord
+  {
+  public:
+
+    PrefsCategories()
+    { add(category_id); add(category_name); }
+
+    Gtk::TreeModelColumn<int> category_id;
+    Gtk::TreeModelColumn<Glib::ustring> category_name;
+  };
+
+  PrefsCategories prefs_categories;
+
+  //Child widgets:
+  Gtk::HBox setup_dialog_hbox;
+
+  Gtk::ScrolledWindow prefs_categories_scrolledwindow;
+  Gtk::TreeView prefs_categories_treeview;
+  Glib::RefPtr<Gtk::TreeStore> prefs_categories_reftreemodel;
+
+
 public:
 
 	void set_time_format(synfig::Time::Format time_format);
