@@ -111,49 +111,14 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	ok_button->signal_clicked().connect(sigc::mem_fun(*this, &Dialog_Setup::on_ok_pressed));
 
 
-	/*********/
-	/* Gamma */
-	/*********/
-
-	Gtk::Table *gamma_table=manage(new Gtk::Table(2,2,false));
-
-	gamma_table->attach(gamma_pattern, 0, 2, 0, 1, Gtk::EXPAND, Gtk::SHRINK|Gtk::FILL, 0, 0);
-
-	Gtk::HScale* scale_gamma_r(manage(new Gtk::HScale(adj_gamma_r)));
-	gamma_table->attach(*manage(new Gtk::Label(_("Red"))), 0, 1, 1, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	gamma_table->attach(*scale_gamma_r, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	adj_gamma_r.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_r_change));
-
-	Gtk::HScale* scale_gamma_g(manage(new Gtk::HScale(adj_gamma_g)));
-	gamma_table->attach(*manage(new Gtk::Label(_("Green"))), 0, 1, 2, 3, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	gamma_table->attach(*scale_gamma_g, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	adj_gamma_g.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_g_change));
-
-	Gtk::HScale* scale_gamma_b(manage(new Gtk::HScale(adj_gamma_b)));
-	gamma_table->attach(*manage(new Gtk::Label(_("Blue"))), 0, 1, 3, 4, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	gamma_table->attach(*scale_gamma_b, 1, 2, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	adj_gamma_b.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_b_change));
-
-	gamma_table->attach(*manage(new Gtk::Label(_("Black Level"))), 0, 1, 4, 5, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	gamma_table->attach(black_level_selector, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	black_level_selector.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_black_level_change));
-
-	//gamma_table->attach(*manage(new Gtk::Label(_("Red-Blue Level"))), 0, 1, 5, 6, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	//gamma_table->attach(red_blue_level_selector, 1, 2, 5, 6, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
-	//red_blue_level_selector.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_red_blue_level_change));
-
-
-	/********/
-	/* Misc */
-	/********/
-
-	Gtk::Table *misc_table=manage(new Gtk::Table(2,2,false));
-
+	/*************/
+	/* Interface */
+	/*************/
+	Gtk::Table *interface_table = manage(new Gtk::Table(2, 2, false));
 	int xpadding(8), ypadding(8);
-
-	// Misc - Timestamp
-	attach_label(misc_table, _("Timestamp"), 0, xpadding, ypadding);
-	misc_table->attach(timestamp_optionmenu, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	// Timestamp
+	attach_label(interface_table, _("Timestamp"), 0, xpadding, ypadding);
+	interface_table->attach(timestamp_optionmenu, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 
 #define ADD_TIMESTAMP(desc,x) \
 	timestamp_menu.items().push_back( \
@@ -184,70 +149,67 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 			.add_enum_value(Distance::SYSTEM_METERS,"m",_("Meters"))
 			.add_enum_value(Distance::SYSTEM_CENTIMETERS,"cm",_("Centimeters"))
 			.add_enum_value(Distance::SYSTEM_MILLIMETERS,"mm",_("Millimeters"));
-
-		widget_enum=manage(new Widget_Enum());
+		widget_enum = manage(new Widget_Enum());
 		widget_enum->set_param_desc(param_desc);
-
-		attach_label(misc_table, _("Unit System"), 1, xpadding, ypadding);
-		misc_table->attach(*widget_enum, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	// Unit System
+		attach_label(interface_table, _("Unit System"), 1, xpadding, ypadding);
+		interface_table->attach(*widget_enum, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 	}
-
-	// Misc - recent files
-	Gtk::SpinButton* recent_files_spinbutton(manage(new Gtk::SpinButton(adj_recent_files,1,0)));
-	attach_label(misc_table, _("Recent Files"), 2, xpadding, ypadding);
-	misc_table->attach(*recent_files_spinbutton, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-	// Misc - use_colorspace_gamma
-	misc_table->attach(toggle_use_colorspace_gamma, 0, 2, 7, 8, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-	// Misc - auto backup interval
-	attach_label(misc_table, _("Auto Backup Interval (0 to disable)"), 3, xpadding, ypadding);
-	misc_table->attach(auto_backup_interval, 1, 2, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-	// Misc - restrict_radius_ducks
-	misc_table->attach(toggle_restrict_radius_ducks, 0, 2, 8, 9, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-	// Misc - resize_imported_images
-	misc_table->attach(toggle_resize_imported_images, 0, 2, 9, 10, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-	// Misc - enable_experimental_features
-	//misc_table->attach(toggle_enable_experimental_features, 0, 2, 10, 11, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-
-#ifdef SINGLE_THREADED
-	// Misc - single_threaded
-	misc_table->attach(toggle_single_threaded, 0, 2, 11, 12, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-#endif
-
-	// Misc - browser_command
-	attach_label(misc_table, _("Browser Command"), 4, xpadding, ypadding);
-	misc_table->attach(textbox_browser_command, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 
 
 	/************/
 	/* Document */
 	/************/
-	Gtk::Table *document_table = manage(new Gtk::Table(2, 4, false));
-
-	// Document - Preferred file name prefix
-	attach_label(document_table, _("New Document filename prefix"), 0, xpadding, ypadding);
-	document_table->attach(textbox_custom_filename_prefix, 1, 4, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	Gtk::Table *document_table = manage(new Gtk::Table(2, 2, false));
+	// Preferred file name prefix
+	Gtk::Label *new_doc_label (manage (new Gtk::Label(_("New Document"))));
+	document_table->attach(*new_doc_label, 0, 1, 0, 1);
+	document_table->attach(textbox_custom_filename_prefix, 1, 2, 0, 1);
 	textbox_custom_filename_prefix.set_tooltip_text( _("File name prefix for the new created document"));
 
-	// Document - New Document X size
-	attach_label(document_table, _("New Document X size"),1, xpadding, ypadding);
-	document_table->attach(pref_x_size_spinbutton, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	// Template for predefined fps
+	Gtk::Label* fps_label(manage(new Gtk::Label(_("FPS:"))));
+	document_table->attach(*fps_label, 0, 1, 1, 2);
+	document_table->attach(fps_template_combo, 1, 2, 1, 2);
+	fps_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_fps_template_combo_change));
+
+	// Fill the FPS combo box with proper strings (not localised)
+	float f[8];
+	f[0] = 60;
+	f[1] = 50;
+	f[2] = 30;
+	f[3] = 25;
+	f[4] = 24.967;
+	f[5] = 24;
+	f[6] = 15;
+	f[7] = 12;
+	for (int i=0; i<8; i++)
+		fps_template_combo.prepend_text(strprintf("%5.3f", f[i]));
+
+	fps_template_combo.prepend_text(DEFAULT_PREDEFINED_FPS);
+
+	// New Document FPS
+	Gtk::Label * new_fps_label(manage(new Gtk::Label(_("New Document FPS"))));
+	document_table->attach(*new_fps_label, 0, 1, 2, 3);
+	document_table->attach(pref_fps_spinbutton, 1, 2, 2, 3);
+	pref_fps_spinbutton.set_tooltip_text(_("Frames per second of the new created document"));
+
+	// New Document X size
+	Gtk::Label *new_width_label(manage(new Gtk::Label(_("Width"))));
+	document_table->attach(*new_width_label, 0, 1, 3, 4);
+	document_table->attach(pref_x_size_spinbutton, 1, 2, 3, 4);
 	pref_x_size_spinbutton.set_tooltip_text(_("Width in pixels of the new created document"));
 
-	// Document - New Document Y size
-	attach_label(document_table,_("New Document Y size"), 2, xpadding, ypadding);
-	document_table->attach(pref_y_size_spinbutton, 1, 2, 2, 3,Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	// New Document Y size
+	Gtk::Label *new_high_label(manage(new Gtk::Label(_("High"))));
+	document_table->attach(*new_high_label, 0, 1, 4, 5);
+	document_table->attach(pref_y_size_spinbutton, 1, 2, 4, 5);
 	pref_y_size_spinbutton.set_tooltip_text(_("High in pixels of the new created document"));
 
-	//Document - Template for predefined sizes of canvases.
+	// Template for predefined sizes of canvases.
 	Gtk::Label* label(manage(new Gtk::Label(_("Predefined Resolutions:"))));
-	label->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
-	document_table->attach(*label, 2, 3, 1, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	document_table->attach(size_template_combo, 2, 3, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	document_table->attach(*label, 0, 1, 5, 6);
+	document_table->attach(size_template_combo, 1, 2, 5, 6);
 	size_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_size_template_combo_change));
 	size_template_combo.prepend_text(_("4096x3112 Full Aperture 4K"));
 	size_template_combo.prepend_text(_("2048x1556 Full Aperture Native 2K"));
@@ -265,93 +227,178 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	size_template_combo.prepend_text(_("360x203   Web 360x HD"));
 	size_template_combo.prepend_text(DEFAULT_PREDEFINED_SIZE);
 
-	//Document - Template for predefined fps
-	Gtk::Label* label1(manage(new Gtk::Label(_("Predefined FPS:"))));
-	label1->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
-	document_table->attach(*label1, 2, 3, 3, 4, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	document_table->attach(fps_template_combo,2, 3, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	fps_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_fps_template_combo_change));
-	//Document - Fill the FPS combo box with proper strings (not localised)
-	float f[8];
-	f[0] = 60;
-	f[1] = 50;
-	f[2] = 30;
-	f[3] = 25;
-	f[4] = 24.967;
-	f[5] = 24;
-	f[6] = 15;
-	f[7] = 12;
-	for (int i=0; i<8; i++)
-		fps_template_combo.prepend_text(strprintf("%5.3f", f[i]));
+	// Resize_imported_images
+	Gtk::Label *resize_imported_images_label(manage(new Gtk::Label(_("Resize Imported Image"))));
+	document_table->attach(*resize_imported_images_label, 0, 1, 6, 7);
+	document_table->attach(toggle_resize_imported_images, 1, 2, 6, 7);
 
-	fps_template_combo.prepend_text(DEFAULT_PREDEFINED_FPS);
+	// Image sequence separator
+	Gtk::Label *image_sequence_separator_label(manage(new Gtk::Label(_("Image Sequence Separator String"))));
+	document_table->attach(*image_sequence_separator_label, 0, 1, 7, 8);
+	document_table->attach(image_sequence_separator, 1, 2, 7, 8);
 
-	// Document - New Document FPS
-	attach_label(document_table,_("New Document FPS"), 4, xpadding, ypadding);
-	document_table->attach(pref_fps_spinbutton, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	pref_fps_spinbutton.set_tooltip_text(_("Frames per second of the new created document"));
+
+	/***********/
+	/* Editing */
+	/***********/
+	Gtk::Table *editing_table=manage(new Gtk::Table(2,2,false));
+
+	// Editing - use_colorspace_gamma
+	editing_table->attach(toggle_use_colorspace_gamma, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	// Misc - restrict_radius_ducks
+	editing_table->attach(toggle_restrict_radius_ducks, 0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+
+
+	/*********/
+	/* Input */
+	/*********/
+	Gtk::Table *input_table=manage(new Gtk::Table(2,2,false));
 
 
 	/**********/
-	/* Render */
+	/* Plugin */
 	/**********/
-	Gtk::Table *render_table = manage(new Gtk::Table(2, 4, false));
+	Gtk::Table *plugin_table=manage(new Gtk::Table(2,2,false));
 
-	// Render - Image sequence separator
-	attach_label(render_table, _("Image Sequence Separator String"), 0, xpadding, ypadding);
-	render_table->attach(image_sequence_separator, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	// Render - Use Cairo on Navigator
-	attach_label(render_table, _("Use Cairo render on Navigator"), 1, xpadding, ypadding);
-	render_table->attach(toggle_navigator_uses_cairo, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
-	// Render - Use Cairo on WorkArea
-	attach_label(render_table, _("Use Cairo render on WorkArea"), 2, xpadding, ypadding);
-	render_table->attach(toggle_workarea_uses_cairo, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 
-	gamma_table->show_all();
-	misc_table->show_all();
+	/**********/
+	/* System */
+	/**********/
+	Gtk::Table *system_table = manage(new Gtk::Table(2, 2, false));
+	// Recent files
+	Gtk::SpinButton* recent_files_spinbutton(manage(new Gtk::SpinButton(adj_recent_files,1,0)));
+	attach_label(system_table, _("Recent Files"), 0, xpadding, ypadding);
+	system_table->attach(*recent_files_spinbutton, 1, 2, 0, 1);
+	// Auto backup interval
+	attach_label(system_table, _("Auto Backup Interval (0 to disable)"), 1, xpadding, ypadding);
+	system_table->attach(auto_backup_interval, 1, 2, 1, 2);
+	// Use Cairo on Navigator
+	attach_label(system_table, _("Use Cairo render on Navigator"), 2, xpadding, ypadding);
+	system_table->attach(toggle_navigator_uses_cairo, 1, 2, 2, 3);
+	// Use Cairo on WorkArea
+	attach_label(system_table, _("Use Cairo render on WorkArea"), 3, xpadding, ypadding);
+	system_table->attach(toggle_workarea_uses_cairo, 1, 2, 3, 4);
+	// Misc - browser_command
+	attach_label(system_table, _("Browser Command"), 4, xpadding, ypadding);
+	system_table->attach(textbox_browser_command, 1, 2, 4, 5);
+
+
+
+	/*********/
+	/* Gamma */
+	/*********/
+	Gtk::Table *system_gamma_table=manage(new Gtk::Table(2,2,false));
+	system_gamma_table->attach(gamma_pattern, 0, 2, 0, 1, Gtk::EXPAND, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	Gtk::HScale* scale_gamma_r(manage(new Gtk::HScale(adj_gamma_r)));
+	system_gamma_table->attach(*manage(new Gtk::Label(_("Red"))), 0, 1, 1, 2, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	system_gamma_table->attach(*scale_gamma_r, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	adj_gamma_r.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_r_change));
+
+	Gtk::HScale* scale_gamma_g(manage(new Gtk::HScale(adj_gamma_g)));
+	system_gamma_table->attach(*manage(new Gtk::Label(_("Green"))), 0, 1, 2, 3, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	system_gamma_table->attach(*scale_gamma_g, 1, 2, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	adj_gamma_g.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_g_change));
+
+	Gtk::HScale* scale_gamma_b(manage(new Gtk::HScale(adj_gamma_b)));
+	system_gamma_table->attach(*manage(new Gtk::Label(_("Blue"))), 0, 1, 3, 4, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	system_gamma_table->attach(*scale_gamma_b, 1, 2, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	adj_gamma_b.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_gamma_b_change));
+
+	system_gamma_table->attach(*manage(new Gtk::Label(_("Black Level"))), 0, 1, 4, 5, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	system_gamma_table->attach(black_level_selector, 1, 2, 4, 5, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	black_level_selector.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_black_level_change));
+
+	//gamma_table->attach(*manage(new Gtk::Label(_("Red-Blue Level"))), 0, 1, 5, 6, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	//gamma_table->attach(red_blue_level_selector, 1, 2, 5, 6, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, 0, 0);
+	//red_blue_level_selector.signal_value_changed().connect(sigc::mem_fun(*this,&studio::Dialog_Setup::on_red_blue_level_change));
+
+
+	/*********/
+	/* Brush */
+	/*********/
+	Gtk::Table *system_brush_table=manage(new Gtk::Table(2,2,false));
+
+
+
+	/************/
+	/* Advanced */
+	/************/
+	Gtk::Table *system_advanced_table = manage(new Gtk::Table(2, 2, false));
+	// Enable_experimental_features
+	//system_advanced_table->attach(toggle_enable_experimental_features, 0, 2, 10, 11, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+#ifdef SINGLE_THREADED
+	// Single Threaded
+	system_advanced_table->attach(toggle_single_threaded, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+#endif
+
+	interface_table->show_all();
 	document_table->show_all();
-	render_table->show_all();
+	editing_table->show_all();
+	input_table->show_all();
+	plugin_table->show_all();
+	system_table->show_all();
+	system_gamma_table->show_all();
+	system_brush_table->show_all();
+	system_advanced_table->show_all();
 
-	notebook.append_page(*gamma_table,_("Gamma"));
-	notebook.append_page(*misc_table,_("Misc."));
-	notebook.append_page(*document_table, _("Document"));
-	notebook.append_page(*render_table, _("Render"));
+	notebook.append_page(*interface_table,_("Interface"));
+	notebook.append_page(*document_table,_("Document"));
+	notebook.append_page(*editing_table, _("Editing"));
+	notebook.append_page(*input_table, _("Input"));
+	notebook.append_page(*plugin_table, _("Plugin"));
+	notebook.append_page(*system_table, _("System"));
+	notebook.append_page(*system_gamma_table, _("Gamma"));
+	notebook.append_page(*system_brush_table, _("Brush"));
+	notebook.append_page(*system_advanced_table, _("Advanced"));
 
 
 	/*******************/
 	/* Categories List */
 	/*******************/
-  prefs_categories_reftreemodel = Gtk::TreeStore::create(prefs_categories);
-  prefs_categories_treeview.set_model(prefs_categories_reftreemodel);
+	prefs_categories_reftreemodel = Gtk::TreeStore::create(prefs_categories);
+	prefs_categories_treeview.set_model(prefs_categories_reftreemodel);
 
-  Gtk::TreeModel::Row row = *(prefs_categories_reftreemodel->append());
-  row[prefs_categories.category_id] = 0;
-  row[prefs_categories.category_name] = "Gamma";
+	Gtk::TreeModel::Row row = *(prefs_categories_reftreemodel->append());
+
+	row[prefs_categories.category_id] = 0;
+	row[prefs_categories.category_name] = "Interface";
 
 	row = *(prefs_categories_reftreemodel->append());
-  row[prefs_categories.category_id] = 1;
-  row[prefs_categories.category_name] = "Misc";
+	row[prefs_categories.category_id] = 1;
+	row[prefs_categories.category_name] = "Document";
 
-  row = *(prefs_categories_reftreemodel->append());
-  row[prefs_categories.category_id] = 2;
-  row[prefs_categories.category_name] = "Document";
+	row = *(prefs_categories_reftreemodel->append());
+	row[prefs_categories.category_id] = 2;
+	row[prefs_categories.category_name] = "Editing";
 
-  row = *(prefs_categories_reftreemodel->append());
-  row[prefs_categories.category_id] = 3;
-  row[prefs_categories.category_name] = "Render";
+	row = *(prefs_categories_reftreemodel->append());
+	row[prefs_categories.category_id] = 3;
+	row[prefs_categories.category_name] = "Input";
 
-  row = *(prefs_categories_reftreemodel->append());
-  row[prefs_categories.category_id] = 4;
-  row[prefs_categories.category_name] = "System";
+	row = *(prefs_categories_reftreemodel->append());
+	row[prefs_categories.category_id] = 4;
+	row[prefs_categories.category_name] = "Plugin";
 
-  Gtk::TreeModel::Row childrow = *(prefs_categories_reftreemodel->append(row.children()));
-  childrow[prefs_categories.category_id] = 5;
-  childrow[prefs_categories.category_name] = "Advanced";
+	row = *(prefs_categories_reftreemodel->append());
+	row[prefs_categories.category_id] = 5;
+	row[prefs_categories.category_name] = "System";
 
-  prefs_categories_treeview.append_column("Category", prefs_categories.category_name);
-  prefs_categories_treeview.expand_all();
+	Gtk::TreeModel::Row childrow = *(prefs_categories_reftreemodel->append(row.children()));
+	childrow[prefs_categories.category_id] = 6;
+	childrow[prefs_categories.category_name] = "Gamma";
 
-  prefs_categories_treeview.signal_row_activated().connect(sigc::mem_fun(*this,
+	childrow = *(prefs_categories_reftreemodel->append(row.children()));
+	childrow[prefs_categories.category_id] = 7;
+	childrow[prefs_categories.category_name] = "Brush";
+
+	childrow = *(prefs_categories_reftreemodel->append(row.children()));
+	childrow[prefs_categories.category_id] = 8;
+	childrow[prefs_categories.category_name] = "Advanced";
+
+	prefs_categories_treeview.append_column("Category", prefs_categories.category_name);
+	prefs_categories_treeview.expand_all();
+
+	prefs_categories_treeview.signal_row_activated().connect(sigc::mem_fun(*this,
 																														&Dialog_Setup::on_treeview_row_activated));
 
 	prefs_categories_scrolledwindow.add(prefs_categories_treeview);
