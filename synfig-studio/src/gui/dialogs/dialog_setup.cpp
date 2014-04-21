@@ -396,6 +396,7 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	childrow[prefs_categories.category_name] = "Advanced";
 
 	prefs_categories_treeview.append_column("Category", prefs_categories.category_name);
+	prefs_categories_treeview.set_headers_visible(false);
 	prefs_categories_treeview.expand_all();
 
 	prefs_categories_scrolledwindow.add(prefs_categories_treeview);
