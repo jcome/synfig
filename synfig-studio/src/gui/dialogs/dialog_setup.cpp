@@ -62,12 +62,27 @@ using namespace studio;
 /* === M E T H O D S ======================================================= */
 
 static void
-attach_label(Gtk::Table *table, String str, guint col, guint xpadding, guint ypadding)
+attach_label1(Gtk::Table *table, String str, guint col, guint xpadding, guint ypadding)
 {
-	Gtk::Label* label(manage(new Gtk::Label((str + ":").c_str())));
-	label->set_alignment(Gtk::ALIGN_RIGHT, Gtk::ALIGN_CENTER);
+	Gtk::Label* label(manage(new Gtk::Label(str)));//(str + ":").c_str())));
+	label->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
+
+	Pango::AttrList list;
+	Pango::AttrInt attr = Pango::Attribute::create_attr_weight(Pango::WEIGHT_BOLD);
+	list.insert(attr);
+	label->set_attributes(list);
+
 	table->attach(*label, 0, 1, col, col+1, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
 }
+
+static void
+attach_label2(Gtk::Table *table, String str, guint row, guint col, guint xpadding, guint ypadding)
+{
+	Gtk::Label* label(manage(new Gtk::Label((str + ":").c_str())));
+	label->set_alignment(Gtk::ALIGN_LEFT, Gtk::ALIGN_CENTER);
+	table->attach(*label, row, row + 1, col, col + 1, Gtk::SHRINK|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+}
+
 
 Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	Dialog(_("Preferences"),parent,true),
@@ -81,7 +96,7 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	toggle_single_threaded(_("Use Only a Single Thread")),
 #endif
 	toggle_restrict_radius_ducks(_("Restrict Real-Valued Handles to Top Right Quadrant")),
-	toggle_resize_imported_images(_("Scale New Imported Images to Fit Canvas")),
+//	toggle_resize_imported_images(_("Scale New Imported Images to Fit Canvas")),
 	toggle_enable_experimental_features(_("Enable experimental features (restart required)")),
 	adj_pref_x_size (480, 1, 10000, 1, 10, 0),
 	adj_pref_y_size (270, 1, 10000, 1, 10, 0),
@@ -94,7 +109,7 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	notebook.set_show_tabs (false);
 	notebook.set_show_border (false);
 
-	// Setup the buttons
+	// the buttons
 	Gtk::Button *restore_button(manage(new class Gtk::Button(_("Restore Defaults"))));
 	restore_button->show();
 	add_action_widget(*restore_button, 1);
@@ -114,11 +129,14 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	/*************/
 	/* Interface */
 	/*************/
+
+	int xpadding(8), ypadding(2);
 	Gtk::Table *interface_table = manage(new Gtk::Table(2, 2, false));
-	int xpadding(8), ypadding(8);
+
 	// Timestamp
-	attach_label(interface_table, _("Timestamp"), 0, xpadding, ypadding);
-	interface_table->attach(timestamp_optionmenu, 1, 2, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+	attach_label2(interface_table, _("Timestamp"), 0, 0, xpadding, ypadding);
+	interface_table->attach(timestamp_optionmenu, 1, 2, 0, 1,
+		Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, xpadding, ypadding);
 
 #define ADD_TIMESTAMP(desc,x) \
 	timestamp_menu.items().push_back( \
@@ -152,25 +170,34 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 		widget_enum = manage(new Widget_Enum());
 		widget_enum->set_param_desc(param_desc);
 	// Unit System
-		attach_label(interface_table, _("Unit System"), 1, xpadding, ypadding);
-		interface_table->attach(*widget_enum, 1, 2, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL, xpadding, ypadding);
+		attach_label2(interface_table, _("Unit"), 0, 1, xpadding, ypadding);
+		interface_table->attach(*widget_enum, 1, 2, 1, 2,
+			Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK, xpadding, ypadding);
 	}
 
 
 	/************/
 	/* Document */
 	/************/
+
 	Gtk::Table *document_table = manage(new Gtk::Table(2, 2, false));
+
+	// New document defaults
+	attach_label1(document_table, _("New Canvas Defaults"), 0, xpadding, ypadding);
+
 	// Preferred file name prefix
-	Gtk::Label *new_doc_label (manage (new Gtk::Label(_("New Document"))));
-	document_table->attach(*new_doc_label, 0, 1, 0, 1);
-	document_table->attach(textbox_custom_filename_prefix, 1, 2, 0, 1);
-	textbox_custom_filename_prefix.set_tooltip_text( _("File name prefix for the new created document"));
+	attach_label2(document_table, _("Name prefix"), 0, 1, xpadding, ypadding);
+	document_table->attach(textbox_custom_filename_prefix, 1, 2, 1, 2);
+	textbox_custom_filename_prefix.set_tooltip_text( _("File name prefix for the new document"));
+
+	// New Document FPS
+	attach_label2(document_table, _("FPS"), 0, 2, xpadding, ypadding);
+	document_table->attach(pref_fps_spinbutton, 1, 2, 2, 3);
+	pref_fps_spinbutton.set_tooltip_text(_("Frames per second of the new created document"));
 
 	// Template for predefined fps
-	Gtk::Label* fps_label(manage(new Gtk::Label(_("FPS:"))));
-	document_table->attach(*fps_label, 0, 1, 1, 2);
-	document_table->attach(fps_template_combo, 1, 2, 1, 2);
+	attach_label2(document_table, _("Preset"), 0, 3, xpadding, ypadding);
+	document_table->attach(fps_template_combo, 1, 2, 3, 4);
 	fps_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_fps_template_combo_change));
 
 	// Fill the FPS combo box with proper strings (not localised)
@@ -188,28 +215,21 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 
 	fps_template_combo.prepend_text(DEFAULT_PREDEFINED_FPS);
 
-	// New Document FPS
-	Gtk::Label * new_fps_label(manage(new Gtk::Label(_("New Document FPS"))));
-	document_table->attach(*new_fps_label, 0, 1, 2, 3);
-	document_table->attach(pref_fps_spinbutton, 1, 2, 2, 3);
-	pref_fps_spinbutton.set_tooltip_text(_("Frames per second of the new created document"));
 
-	// New Document X size
-	Gtk::Label *new_width_label(manage(new Gtk::Label(_("Width"))));
-	document_table->attach(*new_width_label, 0, 1, 3, 4);
-	document_table->attach(pref_x_size_spinbutton, 1, 2, 3, 4);
+	// New Document Width
+	attach_label2(document_table, _("Size"), 0, 4, xpadding, ypadding);
+	attach_label2(document_table, _("Width"), 0, 5, xpadding, ypadding);
+	document_table->attach(pref_x_size_spinbutton, 1, 2, 5, 6);
 	pref_x_size_spinbutton.set_tooltip_text(_("Width in pixels of the new created document"));
 
-	// New Document Y size
-	Gtk::Label *new_high_label(manage(new Gtk::Label(_("High"))));
-	document_table->attach(*new_high_label, 0, 1, 4, 5);
-	document_table->attach(pref_y_size_spinbutton, 1, 2, 4, 5);
+	// New Document High
+	attach_label2(document_table, _("Heigh"), 0, 6, xpadding, ypadding);
+	document_table->attach(pref_y_size_spinbutton, 1, 2, 6, 7);
 	pref_y_size_spinbutton.set_tooltip_text(_("High in pixels of the new created document"));
 
 	// Template for predefined sizes of canvases.
-	Gtk::Label* label(manage(new Gtk::Label(_("Predefined Resolutions:"))));
-	document_table->attach(*label, 0, 1, 5, 6);
-	document_table->attach(size_template_combo, 1, 2, 5, 6);
+	attach_label2(document_table, _("Preset"), 0, 7, xpadding, ypadding);
+	document_table->attach(size_template_combo, 1, 2, 7, 8);
 	size_template_combo.signal_changed().connect(sigc::mem_fun(*this, &studio::Dialog_Setup::on_size_template_combo_change));
 	size_template_combo.prepend_text(_("4096x3112 Full Aperture 4K"));
 	size_template_combo.prepend_text(_("2048x1556 Full Aperture Native 2K"));
@@ -228,14 +248,14 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	size_template_combo.prepend_text(DEFAULT_PREDEFINED_SIZE);
 
 	// Resize_imported_images
-	Gtk::Label *resize_imported_images_label(manage(new Gtk::Label(_("Resize Imported Image"))));
-	document_table->attach(*resize_imported_images_label, 0, 1, 6, 7);
-	document_table->attach(toggle_resize_imported_images, 1, 2, 6, 7);
+	attach_label1(document_table, _("Imported Image"), 8, xpadding, ypadding);
+	attach_label2(document_table, _("Scale to fit canvas"), 0, 9, xpadding, ypadding);
+	document_table->attach(toggle_resize_imported_images, 1, 2, 9, 10);
 
 	// Image sequence separator
-	Gtk::Label *image_sequence_separator_label(manage(new Gtk::Label(_("Image Sequence Separator String"))));
-	document_table->attach(*image_sequence_separator_label, 0, 1, 7, 8);
-	document_table->attach(image_sequence_separator, 1, 2, 7, 8);
+	attach_label1(document_table, _("Rendered Images"), 10, xpadding, ypadding);
+	attach_label2(document_table, _("Separator of image sequence"), 0, 11, xpadding, ypadding);
+	document_table->attach(image_sequence_separator, 1, 2, 11, 12);
 
 
 	/***********/
@@ -267,19 +287,19 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	Gtk::Table *system_table = manage(new Gtk::Table(2, 2, false));
 	// Recent files
 	Gtk::SpinButton* recent_files_spinbutton(manage(new Gtk::SpinButton(adj_recent_files,1,0)));
-	attach_label(system_table, _("Recent Files"), 0, xpadding, ypadding);
+	attach_label2(system_table, _("Recent Files"), 0, 0, xpadding, ypadding);
 	system_table->attach(*recent_files_spinbutton, 1, 2, 0, 1);
 	// Auto backup interval
-	attach_label(system_table, _("Auto Backup Interval (0 to disable)"), 1, xpadding, ypadding);
+	attach_label2(system_table, _("Auto Backup Interval (0 to disable)"), 0, 1, xpadding, ypadding);
 	system_table->attach(auto_backup_interval, 1, 2, 1, 2);
 	// Use Cairo on Navigator
-	attach_label(system_table, _("Use Cairo render on Navigator"), 2, xpadding, ypadding);
+	attach_label2(system_table, _("Use Cairo render on Navigator"), 0, 2, xpadding, ypadding);
 	system_table->attach(toggle_navigator_uses_cairo, 1, 2, 2, 3);
 	// Use Cairo on WorkArea
-	attach_label(system_table, _("Use Cairo render on WorkArea"), 3, xpadding, ypadding);
+	attach_label2(system_table, _("Use Cairo render on WorkArea"), 0, 3, xpadding, ypadding);
 	system_table->attach(toggle_workarea_uses_cairo, 1, 2, 3, 4);
 	// Misc - browser_command
-	attach_label(system_table, _("Browser Command"), 4, xpadding, ypadding);
+	attach_label2(system_table, _("Browser Command"), 0, 4, xpadding, ypadding);
 	system_table->attach(textbox_browser_command, 1, 2, 4, 5);
 
 
@@ -412,7 +432,7 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	notebook.show_all();
 
 	setup_dialog_hbox.pack_start(notebook);
-	setup_dialog_hbox.set_border_width(6);
+	setup_dialog_hbox.set_border_width(12);
 
 	get_vbox()->pack_start(setup_dialog_hbox);
 	get_vbox()->set_border_width(12);
