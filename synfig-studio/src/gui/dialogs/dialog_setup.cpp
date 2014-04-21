@@ -398,12 +398,14 @@ Dialog_Setup::Dialog_Setup(Gtk::Window& parent):
 	prefs_categories_treeview.append_column("Category", prefs_categories.category_name);
 	prefs_categories_treeview.expand_all();
 
-	prefs_categories_treeview.signal_row_activated().connect(sigc::mem_fun(*this,
-																														&Dialog_Setup::on_treeview_row_activated));
-
 	prefs_categories_scrolledwindow.add(prefs_categories_treeview);
 	prefs_categories_scrolledwindow.set_size_request(-1, 80);
 	prefs_categories_scrolledwindow.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+
+	// signal handle, show corresponding prefs category tab
+	prefs_category_selection = prefs_categories_treeview.get_selection();
+	prefs_category_selection->signal_changed().connect(
+		sigc::mem_fun(*this,&Dialog_Setup::on_prefs_category_selected));
 
 	setup_dialog_hbox.pack_start(prefs_categories_scrolledwindow);
 	notebook.show_all();
@@ -998,14 +1000,8 @@ RedBlueLevelSelector::on_event(GdkEvent *event)
 }
 
 
-void Dialog_Setup::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* /* column */)
+void Dialog_Setup::on_prefs_category_selected()
 {
-
-  Gtk::TreeModel::iterator iter = prefs_categories_reftreemodel->get_iter(path);
-  if(iter)
-  {
-    Gtk::TreeModel::Row row = *iter;
-    notebook.set_current_page((int)row[prefs_categories.category_id]);
-	}
-
+	Gtk::TreeModel::Row row = *(prefs_categories_treeview.get_selection()->get_selected());
+	notebook.set_current_page((int)row[prefs_categories.category_id]);
 }

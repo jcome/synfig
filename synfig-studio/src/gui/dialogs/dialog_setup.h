@@ -210,24 +210,22 @@ class Dialog_Setup : public Gtk::Dialog
 
 
 protected:
-  //Signal handlers:
-	void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
+//Signal handlers:
+void on_prefs_category_selected();
 
+//Tree model columns:
+class PrefsCategories : public Gtk::TreeModel::ColumnRecord
+{
+	public:
 
+	PrefsCategories()
+	{ add(category_id); add(category_name); }
 
-  //Tree model columns:
-  class PrefsCategories : public Gtk::TreeModel::ColumnRecord
-  {
-  public:
+	Gtk::TreeModelColumn<int> category_id;
+	Gtk::TreeModelColumn<Glib::ustring> category_name;
+};
 
-    PrefsCategories()
-    { add(category_id); add(category_name); }
-
-    Gtk::TreeModelColumn<int> category_id;
-    Gtk::TreeModelColumn<Glib::ustring> category_name;
-  };
-
-  PrefsCategories prefs_categories;
+PrefsCategories prefs_categories;
 
   //Child widgets:
   Gtk::HBox setup_dialog_hbox;
@@ -235,19 +233,17 @@ protected:
   Gtk::ScrolledWindow prefs_categories_scrolledwindow;
   Gtk::TreeView prefs_categories_treeview;
   Glib::RefPtr<Gtk::TreeStore> prefs_categories_reftreemodel;
-
+  Glib::RefPtr<Gtk::TreeSelection> prefs_category_selection;
 
 public:
 
 	void set_time_format(synfig::Time::Format time_format);
-
 	const synfig::Time::Format& get_time_format()const { return time_format; }
 
 	Dialog_Setup(Gtk::Window& parent);
 	~Dialog_Setup();
 
-    void refresh();
-
+	void refresh();
 }; // END of Dialog_Waypoint
 
 }; // END of namespace studio
