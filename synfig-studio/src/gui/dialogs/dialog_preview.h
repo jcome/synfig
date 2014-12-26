@@ -78,7 +78,7 @@ private:
 	void close_window_handler();
 
 protected:
-	Gtk::Table preview_table;
+	Gtk::Grid preview_table;
 
 }; // END of Dialog_Preview
 
