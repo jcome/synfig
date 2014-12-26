@@ -30,6 +30,7 @@
 #include <gtkmm/adjustment.h>
 #include <gtkmm/dialog.h>
 #include <gtkmm/menu.h>
+#include <gtkmm/grid.h>
 #include <gtkmm/spinbutton.h>
 #include <gui/dialogsettings.h>
 
