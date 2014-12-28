@@ -57,10 +57,10 @@ using namespace Gtk;
 
 /* === E N T R Y P O I N T ================================================= */
 
-//dialog_preview stuff...
+// preview window and animation content
 Dialog_Preview::Dialog_Preview()
-:settings(this,"preview"), preview_table(1, 1, true)
-
+:
+settings(this, "preview"), preview_table(1, 1, true)
 {
 	set_title(_("Preview Window"));
 	set_keep_above();
@@ -73,9 +73,11 @@ Dialog_Preview::Dialog_Preview()
 	signal_key_press_event().connect(sigc::mem_fun(*this, &Dialog_Preview::on_key_pressed));
 }
 
+
 Dialog_Preview::~Dialog_Preview()
 {
 }
+
 
 void Dialog_Preview::set_preview(etl::handle<Preview> prev)
 {
@@ -87,6 +89,7 @@ void Dialog_Preview::set_preview(etl::handle<Preview> prev)
 	//preview.update();
 }
 
+
 void Dialog_Preview::on_hide()
 {
 	Window::on_hide();
@@ -94,9 +97,10 @@ void Dialog_Preview::on_hide()
 	preview.stoprender();
 }
 
-//press escape key to close window
+
 bool Dialog_Preview::on_key_pressed(GdkEventKey *ev)
 {
+	// press escape key to close window
 	if (ev->keyval == gdk_keyval_from_name("Escape") )
 	{
 		close_window_handler();
@@ -106,6 +110,7 @@ bool Dialog_Preview::on_key_pressed(GdkEventKey *ev)
 	return false;
 }
 
+
 void Dialog_Preview::close_window_handler()
 {
 	//!Check if the window we want draw is ready
@@ -114,33 +119,39 @@ void Dialog_Preview::close_window_handler()
 
 	if ((window->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0)
 	{
-	unmaximize();
+		unmaximize();
 	}
 
 	hide();
 }
 
-//dialog_previewoptions stuff
+
+// preview options dialog
 Dialog_PreviewOptions::Dialog_PreviewOptions()
-:Dialog(_("Preview Options")),
-adj_zoom(Gtk::Adjustment::create(0.5,0.1,5.0,0.1,0.2)),
-adj_fps(Gtk::Adjustment::create(15,1,120,1,5)),
+:
+Dialog(_("Preview Options")),
+adj_zoom(Gtk::Adjustment::create(0.5, 0.1, 5.0, 0.1, 0.2)),
+adj_fps(Gtk::Adjustment::create(15, 1, 120, 1, 5)),
 check_use_cairo(_("Use _Cairo render"), false),
-check_overbegin(_("_Begin time"),false),
-check_overend(_("_End time"),false),
-settings(this,"prevoptions")
+check_overbegin(_("_Begin time"), false),
+check_overend(_("_End time"), false),
+settings(this, "prevoptions")
 {
 	//framerate = 15.0f;
 	//zoom = 0.2f;
 
-	//set the fps of the time widgets
+	// dialog general layout and the container of option widgets
 	Gtk::Alignment *dialogPadding = manage(new Gtk::Alignment(0, 0, 1, 1));
 	dialogPadding->set_padding(12, 12, 12, 12);
+	// add padding to the box of dialog
 	get_vbox()->add(*dialogPadding);
 
+	// add box to the padding
 	Gtk::VBox *dialogBox = manage(new Gtk::VBox(false, 12));
 	dialogPadding->add(*dialogBox);
 
+	// general settings frame
+	// container of general settings widgets: quality, fps and cairo
 	Gtk::Frame *generalFrame = manage(new Gtk::Frame(_("General settings")));
 	generalFrame->set_shadow_type(Gtk::SHADOW_NONE);
 	((Gtk::Label *) generalFrame->get_label_widget())->set_markup(_("<b>General settings</b>"));
@@ -155,6 +166,7 @@ settings(this,"prevoptions")
 	generalTable->set_col_spacings(12);
 	generalPadding->add(*generalTable);
 
+	// quality
 	Gtk::Label *zoomLabel = manage(new Gtk::Label(_("_Quality")));
 	zoomLabel->set_alignment(0, 0.5);
 	zoomLabel->set_use_underline(TRUE);
@@ -164,6 +176,7 @@ settings(this,"prevoptions")
 	generalTable->attach(*zoomLabel, 0, 1, 0, 1, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 	generalTable->attach(*zoomSpinner, 1, 2, 0, 1, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 
+	// fps setting
 	Gtk::Label *fpsLabel = manage(new Gtk::Label(_("_FPS")));
 	fpsLabel->set_alignment(0, 0.5);
 	fpsLabel->set_use_underline(TRUE);
@@ -173,10 +186,13 @@ settings(this,"prevoptions")
 	generalTable->attach(*fpsLabel, 0, 1, 1, 2, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 	generalTable->attach(*fpsSpinner, 1, 2, 1, 2, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 
+	// cairo render engine
 	check_use_cairo.set_alignment(0, 0.5);
 	check_use_cairo.set_use_underline(TRUE);
 	generalTable->attach(check_use_cairo, 0, 1, 2, 3, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 
+	// time settings
+	// container of time settings widgets: overbegin time and overend time
 	Gtk::Frame *timeFrame = manage(new Gtk::Frame(_("Time settings")));
 	timeFrame->set_shadow_type(Gtk::SHADOW_NONE);
 	((Gtk::Label *) timeFrame->get_label_widget())->set_markup(_("<b>Time settings</b>"));
@@ -191,20 +207,27 @@ settings(this,"prevoptions")
 	timeTable->set_col_spacings(12);
 	timePadding->add(*timeTable);
 
+	// over begin time of checkbutton and time widget
 	check_overbegin.set_alignment(0, 0.5);
 	check_overbegin.set_use_underline(TRUE);
+	time_begin.set_alignment(1);
+	time_begin.set_sensitive(false);
+	check_overbegin.signal_toggled().connect(sigc::mem_fun(*this,&Dialog_PreviewOptions::on_overbegin_toggle));
+
+	// over begin time of checkbutton and time widget
 	check_overend.set_alignment(0, 0.5);
 	check_overend.set_use_underline(TRUE);
-	time_begin.set_alignment(1);
 	time_end.set_alignment(1);
+	time_end.set_sensitive(false);
+	check_overend.signal_toggled().connect(sigc::mem_fun(*this,&Dialog_PreviewOptions::on_overend_toggle));
+
+	// pack overbigin and overend widgets into time settings frame
 	timeTable->attach(check_overbegin, 0, 1, 0, 1, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 	timeTable->attach(time_begin, 1, 2, 0, 1, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 	timeTable->attach(check_overend, 0, 1, 1, 2, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 	timeTable->attach(time_end, 1, 2, 1, 2, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
 
-	check_overbegin.signal_toggled().connect(sigc::mem_fun(*this,&Dialog_PreviewOptions::on_overbegin_toggle));
-	check_overend.signal_toggled().connect(sigc::mem_fun(*this,&Dialog_PreviewOptions::on_overend_toggle));
-
+	// cancel and preview buttons
 	Gtk::Button *cancelButton = manage(new Gtk::Button(Gtk::StockID("gtk-cancel")));
 	cancelButton->signal_clicked().connect(sigc::mem_fun(*this, &Dialog_PreviewOptions::on_cancel_pressed));
 	add_action_widget(*cancelButton, 1);
@@ -216,46 +239,49 @@ settings(this,"prevoptions")
 	add_action_widget(*okbutton, 0);
 	okbutton->show();
 
-	time_begin.set_sensitive(false);
-	time_end.set_sensitive(false);
 	show_all();
 }
+
 
 Dialog_PreviewOptions::~Dialog_PreviewOptions()
 {
 }
 
+
 void Dialog_PreviewOptions::on_ok_pressed()
 {
-	PreviewInfo	i;
+	PreviewInfo i;
 	i.zoom = get_zoom();
 	i.fps = get_fps();
 	i.overbegin = get_begin_override();
 	i.overend = get_end_override();
 	i.use_cairo = get_use_cairo();
 	if(i.overbegin) i.begintime = (float)get_begintime();
-	if(i.overend)	i.endtime = (float)get_endtime();
+	if(i.overend) i.endtime = (float)get_endtime();
 
 	hide();
 	signal_finish_(i);
 	signal_finish_.clear();
 }
 
-void
-Dialog_PreviewOptions::on_cancel_pressed()
+
+void Dialog_PreviewOptions::on_cancel_pressed()
 {
 	hide();
 }
+
 
 void Dialog_PreviewOptions::on_overbegin_toggle()
 {
 	time_begin.set_sensitive(get_begin_override());
 }
 
+
 void Dialog_PreviewOptions::on_overend_toggle()
 {
 	time_end.set_sensitive(get_end_override());
 }
+
 
 void studio::Dialog_PreviewOptions::set_global_fps(float f)
 {
