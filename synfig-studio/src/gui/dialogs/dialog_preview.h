@@ -48,8 +48,8 @@ namespace studio {
 
 struct PreviewInfo
 {
-	float zoom,fps,begintime,endtime;
-	bool overbegin,overend;
+	float zoom, fps, begintime, endtime;
+	bool overbegin, overend;
 	bool use_cairo;
 };
 
@@ -85,22 +85,25 @@ protected:
 
 class Dialog_PreviewOptions : public Gtk::Dialog
 {
-	//all the info needed to construct a render description...
-	Glib::RefPtr<Gtk::Adjustment>	adj_zoom;	// factor at which to resize the window...
+	// all the info needed to construct a render description...
+	// the quality of rendered preview samples of the animation
+	Glib::RefPtr<Gtk::Adjustment> adj_zoom;
 
-	Glib::RefPtr<Gtk::Adjustment>	adj_fps;	// how often to take samples of the animation
-	
+	// how often to take samples of the animation
+	Glib::RefPtr<Gtk::Adjustment> adj_fps;
+
+	// user cairo as render engine
 	Gtk::CheckButton check_use_cairo;
 
+	// the start time and end time of preview by default they are
+	// same as which defined in the document, they can be customized
+	// by enable over begin and over end options.
+	// start time:
 	studio::Widget_Time time_begin;
-	studio::Widget_Time time_end;
-
 	Gtk::CheckButton check_overbegin;
+	// end time:
+	studio::Widget_Time time_end;
 	Gtk::CheckButton check_overend;
-
-	DialogSettings	settings;
-
-	float	globalfps;
 
 	// for finishing
 	void on_ok_pressed();
@@ -110,7 +113,12 @@ class Dialog_PreviewOptions : public Gtk::Dialog
 	void on_overbegin_toggle();
 	void on_overend_toggle();
 
-	sigc::signal<void,const PreviewInfo &>	signal_finish_;
+	float globalfps;
+
+	DialogSettings settings;
+
+	sigc::signal<void, const PreviewInfo &> signal_finish_;
+
 public:
 	Dialog_PreviewOptions();
 	~Dialog_PreviewOptions();
@@ -139,7 +147,7 @@ public:
 	bool get_use_cairo() const { return check_use_cairo.get_active(); }
 	void set_use_cairo(bool u) { check_use_cairo.set_active(u); }
 
-	sigc::signal<void,const PreviewInfo &>	&signal_finish() {return signal_finish_;}
+	sigc::signal<void, const PreviewInfo &>	&signal_finish() {return signal_finish_;}
 };
 
 }; // END of namespace studio
