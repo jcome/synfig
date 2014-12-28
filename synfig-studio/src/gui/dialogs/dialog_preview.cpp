@@ -60,7 +60,7 @@ using namespace Gtk;
 // preview window and animation content
 Dialog_Preview::Dialog_Preview()
 :
-settings(this, "preview"), preview_table(1, 1, true)
+settings(this, "preview"), preview_table()
 {
 	set_title(_("Preview Window"));
 	set_keep_above();
@@ -161,9 +161,9 @@ settings(this, "prevoptions")
 	generalPadding->set_padding(6, 0, 24, 0);
 	generalFrame->add(*generalPadding);
 
-	Gtk::Table *generalTable = manage(new Gtk::Table(2, 2, false));
-	generalTable->set_row_spacings(6);
-	generalTable->set_col_spacings(12);
+	Gtk::Grid *generalTable = manage(new Gtk::Grid());
+	generalTable->set_row_spacing(6);
+	generalTable->set_column_spacing(12);
 	generalPadding->add(*generalTable);
 
 	// quality
@@ -173,8 +173,8 @@ settings(this, "prevoptions")
 	Gtk::SpinButton *zoomSpinner = manage(new Gtk::SpinButton(adj_zoom, 0.1, 2));
 	zoomLabel->set_mnemonic_widget(*zoomSpinner);
 	zoomSpinner->set_alignment(1);
-	generalTable->attach(*zoomLabel, 0, 1, 0, 1, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
-	generalTable->attach(*zoomSpinner, 1, 2, 0, 1, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
+	generalTable->attach(*zoomLabel, 0, 0, 1, 1);
+	generalTable->attach(*zoomSpinner, 1, 0, 1, 1);
 
 	// fps setting
 	Gtk::Label *fpsLabel = manage(new Gtk::Label(_("_FPS")));
@@ -183,13 +183,13 @@ settings(this, "prevoptions")
 	Gtk::SpinButton *fpsSpinner = manage(new Gtk::SpinButton(adj_fps, 1, 1));
 	fpsLabel->set_mnemonic_widget(*fpsSpinner);
 	fpsSpinner->set_alignment(1);
-	generalTable->attach(*fpsLabel, 0, 1, 1, 2, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
-	generalTable->attach(*fpsSpinner, 1, 2, 1, 2, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
+	generalTable->attach(*fpsLabel, 0, 1, 1, 1);
+	generalTable->attach(*fpsSpinner, 1, 1, 1, 1);
 
 	// cairo render engine
 	check_use_cairo.set_alignment(0, 0.5);
 	check_use_cairo.set_use_underline(TRUE);
-	generalTable->attach(check_use_cairo, 0, 1, 2, 3, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
+	generalTable->attach(check_use_cairo, 0, 2, 1, 1);
 
 	// time settings
 	// container of time settings widgets: overbegin time and overend time
@@ -202,9 +202,9 @@ settings(this, "prevoptions")
 	timePadding->set_padding(6, 0, 24, 0);
 	timeFrame->add(*timePadding);
 
-	Gtk::Table *timeTable = manage(new Gtk::Table(2, 2, false));
-	timeTable->set_row_spacings(6);
-	timeTable->set_col_spacings(12);
+	Gtk::Grid *timeTable = manage(new Gtk::Grid());
+	timeTable->set_row_spacing(6);
+	timeTable->set_column_spacing(12);
 	timePadding->add(*timeTable);
 
 	// over begin time of checkbutton and time widget
@@ -222,10 +222,10 @@ settings(this, "prevoptions")
 	check_overend.signal_toggled().connect(sigc::mem_fun(*this,&Dialog_PreviewOptions::on_overend_toggle));
 
 	// pack overbigin and overend widgets into time settings frame
-	timeTable->attach(check_overbegin, 0, 1, 0, 1, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
-	timeTable->attach(time_begin, 1, 2, 0, 1, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
-	timeTable->attach(check_overend, 0, 1, 1, 2, Gtk::SHRINK | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
-	timeTable->attach(time_end, 1, 2, 1, 2, Gtk::EXPAND | Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 0, 0);
+	timeTable->attach(check_overbegin, 0, 0, 1, 1);
+	timeTable->attach(time_begin, 1, 0, 1, 1);
+	timeTable->attach(check_overend, 0, 1, 1, 1);
+	timeTable->attach(time_end, 1, 1, 1, 1);
 
 	// cancel and preview buttons
 	Gtk::Button *cancelButton = manage(new Gtk::Button(Gtk::StockID("gtk-cancel")));
