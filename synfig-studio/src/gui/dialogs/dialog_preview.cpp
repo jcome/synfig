@@ -137,9 +137,6 @@ check_overbegin(_("_Begin time"), false),
 check_overend(_("_End time"), false),
 settings(this, "prevoptions")
 {
-	//framerate = 15.0f;
-	//zoom = 0.2f;
-
 	// dialog general layout and the container of option widgets
 	Gtk::Alignment *dialogPadding = manage(new Gtk::Alignment(0, 0, 1, 1));
 	dialogPadding->set_padding(12, 12, 12, 12);
