@@ -80,16 +80,18 @@ using namespace studio;
 class studio::Preview::Preview_Target_Cairo : public Target_Cairo
 {
 	Preview *prev;
+
 public:
+
 	Preview_Target_Cairo(Preview *prev_): prev(prev_)
 	{
 	}
-	
+
 	virtual bool set_rend_desc(RendDesc *r)
 	{
 		return Target_Cairo::set_rend_desc(r);
 	}
-	
+
 	virtual bool obtain_surface(cairo_surface_t*& surface)
 	{
 		int w=desc.get_w(), h=desc.get_h();
@@ -99,12 +101,12 @@ public:
 
 	bool put_surface(cairo_surface_t *surf, synfig::ProgressCallback *cb)
 	{
-		if(!prev)
+		if (!prev)
 			return false;
 		gamma_filter(surf, studio::App::gamma);
-		if(cairo_surface_status(surf))
+		if (cairo_surface_status(surf))
 		{
-			if(cb) cb->error(_("Cairo Surface bad status"));
+			if (cb) cb->error(_("Cairo Surface bad status"));
 			return false;
 		}
 		FlipbookElem	fe;
@@ -114,11 +116,12 @@ public:
 		fe.surface=cairo_surface_reference(surf);
 		prev->push_back(fe);
 		prev->signal_changed()();
-		
+
 		cairo_surface_destroy(surf);
 		return true;
 	}
 };
+
 
 class studio::Preview::Preview_Target : public Target_Scanline
 {
@@ -128,9 +131,9 @@ class studio::Preview::Preview_Target : public Target_Scanline
 
 	int scanline;
 
-	double	tbegin,tend;
+	double	tbegin, tend;
 
-	int		nframes,curframe;
+	int nframes, curframe;
 
 public:
 
@@ -146,16 +149,17 @@ public:
 
 	virtual bool set_rend_desc(RendDesc *r)
 	{
-		if(Target_Scanline::set_rend_desc(r))
+		if (Target_Scanline::set_rend_desc(r))
 		{
 			/*synfig::warning("Succeeded in setting the desc to new one: %d x %d, %.2f fps [%.2f,%.2f]",
 							desc.get_w(),desc.get_h(),desc.get_frame_rate(),
 					(float)desc.get_time_start(),(float)desc.get_time_end());*/
 
-			surface.set_wh(desc.get_w(),desc.get_h());
+			surface.set_wh(desc.get_w(), desc.get_h());
 
 			curframe = 0;
-			nframes = (int)floor((desc.get_time_end() - desc.get_time_start())*desc.get_frame_rate());
+			nframes = (int)floor((desc.get_time_end() - desc.get_time_start()) *
+						desc.get_frame_rate());
 
 			tbegin = desc.get_time_start();
 			tend = tbegin + nframes/desc.get_frame_rate();
@@ -185,7 +189,8 @@ public:
 
 	virtual bool end_scanline() {return true;}
 
-	sigc::signal<void, const Preview_Target *>	&signal_frame_done() {return signal_frame_done_;}
+	sigc::signal<void, const Preview_Target *>	&signal_frame_done() {
+			return signal_frame_done_;}
 
 	const Surface &get_surface() const {return surface;}
 
@@ -197,7 +202,9 @@ public:
 	}
 };
 
-studio::Preview::Preview(const studio::CanvasView::LooseHandle &h, float zoom, float f):
+studio::Preview::Preview(const studio::CanvasView::LooseHandle &h,
+						float zoom, float f)
+:
 	canvasview(h),
 	zoom(zoom),
 	fps(f),
@@ -208,33 +215,41 @@ studio::Preview::Preview(const studio::CanvasView::LooseHandle &h, float zoom, f
 	use_cairo(),
 	quality(),
 	global_fps()
-{ }
+{
+}
+
 
 void studio::Preview::set_canvasview(const studio::CanvasView::LooseHandle &h)
 {
 	canvasview = h;
 
-	if(canvasview)
+	if (canvasview)
 	{
 		//perhaps reset override values...
 		const RendDesc &r = canvasview->get_canvas()->rend_desc();
-		if(r.get_frame_rate())
+		if (r.get_frame_rate())
 		{
 			float rate = 1/r.get_frame_rate();
-			overbegin = false; begintime = r.get_time_start() + r.get_frame_start()*rate;
-			overend = false; endtime = r.get_time_start() + r.get_frame_end()*rate;
+
+			overbegin = false;
+			begintime = r.get_time_start() + r.get_frame_start()*rate;
+
+			overend = false;
+			endtime = r.get_time_start() + r.get_frame_end()*rate;
 		}
 	}
 }
+
 
 studio::Preview::~Preview()
 {
 	signal_destroyed_(this); //tell anything that attached to us, we're dying
 }
 
+
 void studio::Preview::render()
 {
-	if(canvasview)
+	if (canvasview)
 	{
 
 		//render description
@@ -257,12 +272,12 @@ void studio::Preview::render()
 		desc.set_frame_rate(newfps);
 		desc.set_render_excluded_contexts(false);
 
-		if(overbegin)
+		if (overbegin)
 		{
 			desc.set_time_start(begintime);
 			//synfig::warning("Set start time to %.2f...",(float)desc.get_time_start());
 		}
-		if(overend)
+		if (overend)
 		{
 			desc.set_time_end(endtime);
 			//synfig::warning("Set end time to %.2f...",(float)desc.get_time_end());
@@ -270,22 +285,27 @@ void studio::Preview::render()
 
 		//setting the description
 
-		//HACK - add on one extra frame because the renderer can't render the last frame
-		// Maybe this can be removed now because the next_time(&t) was refacgorized to consider the last frame too
+		//HACK - add on one extra frame because the renderer can't render the
+		//last frame Maybe this can be removed now because the next_time(&t) was
+		//refacgorized to consider the last frame too
 		//TODO: do not use get_time on Preview_Target
 		desc.set_time_end(desc.get_time_end() + 1.000001/fps);
 
 		// Render using a Preview target (cairo or not)
 		etl::handle<Target> target;
-		if(use_cairo)
+		if (use_cairo)
 		{
-			target = etl::handle<Target>::cast_dynamic(new Preview_Target_Cairo(this));
+			target = etl::handle<Target>::cast_dynamic(
+					new Preview_Target_Cairo(this));
 		}
+
 		else
 		{
 			etl::handle<Preview_Target> t_target = new Preview_Target;
 			//connect our information to his...
-			t_target->signal_frame_done().connect(sigc::mem_fun(*this,&Preview::frame_finish));
+			t_target->signal_frame_done().connect(sigc::mem_fun(*this,
+					&Preview::frame_finish));
+
 			target =etl::handle<Target>::cast_dynamic(t_target);
 		}
 		//set the options
@@ -298,11 +318,12 @@ void studio::Preview::render()
 		frames.resize(0);
 
 		//now tell it to go... with inherited prog. reporting...
-		if(renderer) renderer->stop();
+		if (renderer) renderer->stop();
 		renderer = new AsyncRenderer(target);
 		renderer->start();
 	}
 }
+
 
 void studio::Preview::clear()
 {
@@ -314,6 +335,7 @@ static void free_guint8(const guint8 *mem)
 {
 	free((void*)mem);
 }
+
 
 void studio::Preview::frame_finish(const Preview_Target *targ)
 {
@@ -332,19 +354,19 @@ void studio::Preview::frame_finish(const Preview_Target *targ)
 	//synfig::warning("Creating a buffer");
 	unsigned char *buffer((unsigned char*)malloc(total_bytes));
 
-	if(!buffer)
+	if (!buffer)
 		return;
 
 	//convert all the pixels to the pixbuf... buffer... thing...
 	//synfig::warning("Converting...");
-	convert_color_format(buffer, surf[0], surf.get_w()*surf.get_h(), pf, App::gamma);
+	convert_color_format(buffer, surf[0], surf.get_w()*surf.get_h(), pf,
+						App::gamma);
 
 	//load time
 	fe.t = time;
 	//uses and manages the memory for the buffer...
 	//synfig::warning("Create a pixmap...");
-	fe.buf =
-	Gdk::Pixbuf::create_from_data(
+	fe.buf = Gdk::Pixbuf::create_from_data(
 		buffer,	// pointer to the data
 		Gdk::COLORSPACE_RGB, // the colorspace
 		((pf&PF_A)==PF_A), // has alpha?
@@ -362,13 +384,15 @@ void studio::Preview::frame_finish(const Preview_Target *targ)
 	signal_changed()();
 }
 
-#define IMAGIFY_BUTTON(button,stockid,tooltip) \
-        icon = manage(new Gtk::Image(Gtk::StockID(stockid), Gtk::ICON_SIZE_BUTTON)); \
+
+#define IMAGIFY_BUTTON(button, stockid, tooltip) \
+	icon = manage(new Gtk::Image(Gtk::StockID(stockid), \
+		Gtk::ICON_SIZE_BUTTON)); \
 	button->set_tooltip_text(tooltip); \
-        button->add(*icon); \
-        button->set_relief(Gtk::RELIEF_NONE); \
-        button->show(); \
-	icon->set_padding(0,0); \
+	button->add(*icon); \
+	button->set_relief(Gtk::RELIEF_NONE); \
+	button->show(); \
+	icon->set_padding(0, 0); \
 	icon->show();
 
 Widget_Preview::Widget_Preview():
@@ -377,7 +401,8 @@ Widget_Preview::Widget_Preview():
 	scr_time_scrub(adj_time_scrub),
 	b_loop(/*_("Loop")*/),
 	current_surface(NULL),
-	currentindex(-100000),//TODO get the value from canvas setting or preview option
+	currentindex(-100000),
+		//TODO get the value from canvas setting or preview option
 	audiotime(0),
 	adj_sound(Gtk::Adjustment::create(0, 0, 4)),
 	l_lasttime("0s"),
@@ -394,10 +419,12 @@ Widget_Preview::Widget_Preview():
 	zoom_preview(true)
 {
 	//catch key press event for shortcut keys
-	signal_key_press_event().connect(sigc::mem_fun(*this, &Widget_Preview::on_key_pressed));
+	signal_key_press_event().connect(sigc::mem_fun(*this,
+						&Widget_Preview::on_key_pressed));
 
 	//connect to expose events
-	//signal_expose_event().connect(sigc::mem_fun(*this, &studio::Widget_Preview::redraw));
+	//signal_expose_event().connect(sigc::mem_fun(*this,
+	//					&studio::Widget_Preview::redraw));
 
 	//manage all the change in values etc...
 
@@ -414,10 +441,15 @@ Widget_Preview::Widget_Preview():
 	draw_area.override_background_color(bg_color);
 
 
-	adj_time_scrub->signal_value_changed().connect(sigc::mem_fun(*this,&Widget_Preview::slider_move));
-	scr_time_scrub.signal_event().connect(sigc::mem_fun(*this,&Widget_Preview::scroll_move_event));
-	draw_area.signal_draw().connect(sigc::mem_fun(*this,&Widget_Preview::redraw));
-	
+	adj_time_scrub->signal_value_changed().connect(sigc::mem_fun(*this,
+					&Widget_Preview::slider_move));
+
+	scr_time_scrub.signal_event().connect(sigc::mem_fun(*this,
+					&Widget_Preview::scroll_move_event));
+
+	draw_area.signal_draw().connect(sigc::mem_fun(*this,
+					&Widget_Preview::redraw));
+
 	scr_time_scrub.set_draw_value(0);
 
 	timedisp = -1;
@@ -432,55 +464,63 @@ Widget_Preview::Widget_Preview():
 
 	//prev rendered frame
 	Gtk::Button *prev_framebutton;
-	Gtk::Image *icon0 = manage(new Gtk::Image(Gtk::StockID("synfig-animate_seek_prev_frame"), Gtk::ICON_SIZE_BUTTON));
+	Gtk::Image *icon0 = manage(new Gtk::Image(
+		Gtk::StockID("synfig-animate_seek_prev_frame"), Gtk::ICON_SIZE_BUTTON));
 	prev_framebutton = manage(new class Gtk::Button());
 	prev_framebutton->set_tooltip_text(_("Prev frame"));
-	icon0->set_padding(0,0);
+	icon0->set_padding(0, 0);
 	icon0->show();
 	prev_framebutton->add(*icon0);
 	prev_framebutton->set_relief(Gtk::RELIEF_NONE);
 	prev_framebutton->show();
-	prev_framebutton->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,&Widget_Preview::seek_frame), -1));
+	prev_framebutton->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,
+						&Widget_Preview::seek_frame), -1));
 
 	toolbar->pack_start(*prev_framebutton, Gtk::PACK_SHRINK, 0);
 
 	{ //play
-		Gtk::Image *icon = manage(new Gtk::Image(Gtk::StockID("synfig-animate_play"), Gtk::ICON_SIZE_BUTTON));
+		Gtk::Image *icon = manage(new Gtk::Image(
+			Gtk::StockID("synfig-animate_play"), Gtk::ICON_SIZE_BUTTON));
 		play_button = manage(new class Gtk::Button());
 		play_button->set_tooltip_text(_("Play"));
-		icon->set_padding(0,0);
+		icon->set_padding(0, 0);
 		icon->show();
 		play_button->add(*icon);
 		play_button->set_relief(Gtk::RELIEF_NONE);
 		play_button->show();
-		play_button->signal_clicked().connect(sigc::mem_fun(*this,&Widget_Preview::on_play_pause_pressed));
+		play_button->signal_clicked().connect(sigc::mem_fun(*this,
+			&Widget_Preview::on_play_pause_pressed));
 		toolbar->pack_start(*play_button, Gtk::PACK_SHRINK, 0);
 	}
 
 	{ //pause
-		Gtk::Image *icon = manage(new Gtk::Image(Gtk::StockID("synfig-animate_pause"), Gtk::ICON_SIZE_BUTTON));
+		Gtk::Image *icon = manage(new Gtk::Image(
+			Gtk::StockID("synfig-animate_pause"), Gtk::ICON_SIZE_BUTTON));
 		pause_button = manage(new class Gtk::Button());
 		pause_button->set_tooltip_text(_("Pause"));
-		icon->set_padding(0,0);
+		icon->set_padding(0, 0);
 		icon->show();
 		pause_button->add(*icon);
 		pause_button->set_relief(Gtk::RELIEF_NONE);
-		pause_button->signal_clicked().connect(sigc::mem_fun(*this,&Widget_Preview::on_play_pause_pressed));
+		pause_button->signal_clicked().connect(sigc::mem_fun(*this,
+			&Widget_Preview::on_play_pause_pressed));
 		toolbar->pack_start(*pause_button, Gtk::PACK_SHRINK, 0);
 	}
 
 
 	//next rendered frame
 	Gtk::Button *next_framebutton;
-	Gtk::Image *icon2 = manage(new Gtk::Image(Gtk::StockID("synfig-animate_seek_next_frame"), Gtk::ICON_SIZE_BUTTON));
+	Gtk::Image *icon2 = manage(new Gtk::Image(
+		Gtk::StockID("synfig-animate_seek_next_frame"), Gtk::ICON_SIZE_BUTTON));
 	next_framebutton = manage(new class Gtk::Button());
 	next_framebutton->set_tooltip_text(_("Next frame"));
-	icon2->set_padding(0,0);
+	icon2->set_padding(0, 0);
 	icon2->show();
 	next_framebutton->add(*icon2);
 	next_framebutton->set_relief(Gtk::RELIEF_NONE);
 	next_framebutton->show();
-	next_framebutton->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,&Widget_Preview::seek_frame), 1));
+	next_framebutton->signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,
+					&Widget_Preview::seek_frame), 1));
 
 	toolbar->pack_start(*next_framebutton, Gtk::PACK_SHRINK, 0);
 
@@ -492,8 +532,8 @@ Widget_Preview::Widget_Preview():
 
 	//loop
 	button = &b_loop;
-	IMAGIFY_BUTTON(button,"synfig-animate_loop", _("Loop"));
-	toolbar->pack_start(b_loop, Gtk::PACK_SHRINK,0);
+	IMAGIFY_BUTTON(button, "synfig-animate_loop", _("Loop"));
+	toolbar->pack_start(b_loop, Gtk::PACK_SHRINK, 0);
 
 	//spacing
 	Gtk::Alignment *space1 = Gtk::manage(new Gtk::Alignment());
@@ -503,21 +543,24 @@ Widget_Preview::Widget_Preview():
 
 	//halt render
 	button = manage(new Gtk::Button(/*_("Halt Render")*/));
-	button->signal_clicked().connect(sigc::mem_fun(*this,&Widget_Preview::stoprender));
-	IMAGIFY_BUTTON(button,Gtk::Stock::STOP, _("Halt render"));
+	button->signal_clicked().connect(sigc::mem_fun(*this,
+			&Widget_Preview::stoprender));
+	IMAGIFY_BUTTON(button, Gtk::Stock::STOP, _("Halt render"));
 
 	toolbar->pack_start(*button, Gtk::PACK_SHRINK, 0);
 
 	//re-preview
 	button = manage(new Gtk::Button(/*_("Re-Preview")*/));
-	button->signal_clicked().connect(sigc::mem_fun(*this,&Widget_Preview::repreview));
+	button->signal_clicked().connect(sigc::mem_fun(*this,
+			&Widget_Preview::repreview));
 	IMAGIFY_BUTTON(button, Gtk::Stock::EDIT, _("Re-preview"));
 
 	toolbar->pack_start(*button, Gtk::PACK_SHRINK, 0);
 
 	//erase all
 	button = manage(new Gtk::Button(/*_("Erase All")*/));
-	button->signal_clicked().connect(sigc::mem_fun(*this,&Widget_Preview::eraseall));
+	button->signal_clicked().connect(sigc::mem_fun(*this,
+			&Widget_Preview::eraseall));
 	IMAGIFY_BUTTON(button, Gtk::Stock::CLEAR, _("Erase all rendered frame(s)"));
 
 	toolbar->pack_start(*button, Gtk::PACK_SHRINK, 0);
@@ -534,8 +577,10 @@ Widget_Preview::Widget_Preview():
 	jack_dispatcher.connect(sigc::mem_fun(*this, &Widget_Preview::on_jack_sync));
 
 	jackbutton = jackdial->get_toggle_jackbutton();
-	jackdial->signal_toggle_jack().connect(sigc::mem_fun(*this, &studio::Widget_Preview::toggle_jack_button));
-	jackdial->signal_offset_changed().connect(sigc::mem_fun(*this, &studio::Widget_Preview::on_jack_offset_changed));
+	jackdial->signal_toggle_jack().connect(sigc::mem_fun(*this,
+			&studio::Widget_Preview::toggle_jack_button));
+	jackdial->signal_offset_changed().connect(sigc::mem_fun(*this,
+			&studio::Widget_Preview::on_jack_offset_changed));
 #endif
 	//FIXME: Hardcoded FPS!
 	jackdial->set_fps(24.f);
@@ -548,7 +593,8 @@ Widget_Preview::Widget_Preview():
 	factor_refTreeModel = Gtk::ListStore::create(factors);
 	zoom_preview.set_model(factor_refTreeModel);
 	zoom_preview.property_has_frame() = true;
-	zoom_preview.signal_changed().connect(sigc::mem_fun(*this, &Widget_Preview::preview_draw));
+	zoom_preview.signal_changed().connect(sigc::mem_fun(*this,
+		&Widget_Preview::preview_draw));
 
 	Gtk::TreeModel::Row row = *(factor_refTreeModel->append());
 	row[factors.factor_id] = "1";
@@ -574,7 +620,8 @@ Widget_Preview::Widget_Preview():
 	Gtk::Entry* entry = zoom_preview.get_entry();
 	entry->set_text("100%"); //default zoom level
 	entry->set_icon_from_stock(Gtk::StockID("synfig-zoom"));
-	entry->signal_activate().connect(sigc::mem_fun(*this, &Widget_Preview::on_zoom_entry_activated));
+	entry->signal_activate().connect(sigc::mem_fun(*this,
+		&Widget_Preview::on_zoom_entry_activated));
 
 	//set the zoom widget width
 	zoom_preview.set_size_request(100, -1);
@@ -593,7 +640,7 @@ Widget_Preview::Widget_Preview():
 
 	status->show_all();
 
-	// attach all widgets	
+	// attach all widgets
 	attach(preview_window, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0);
 	attach(scr_time_scrub, 0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
 	attach(*toolbar, 0, 1, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL);
@@ -605,9 +652,11 @@ Widget_Preview::Widget_Preview():
 	#endif
 }
 
+
 studio::Widget_Preview::~Widget_Preview()
 {
 }
+
 
 void studio::Widget_Preview::update()
 {
@@ -615,10 +664,11 @@ void studio::Widget_Preview::update()
 	double time = adj_time_scrub->get_value();
 
 	//find the frame and display it...
-	if(preview)
+	if (preview)
 	{
 		#ifdef WITH_JACK
-		if (jack_enabled && !jack_synchronizing && !is_time_equal_to_current_frame(jack_time - jack_offset))
+		if (jack_enabled && !jack_synchronizing &&
+				!is_time_equal_to_current_frame(jack_time - jack_offset))
 		{
 			jack_nframes_t sr = jack_get_sample_rate(jack_client);
 			jack_nframes_t nframes = ((double)sr * (time + jack_offset));
@@ -632,19 +682,22 @@ void studio::Widget_Preview::update()
 		//synfig::warning("Updating at %.3f s",time);
 
 		//use time to find closest frame...
-		studio::Preview::FlipBook::const_iterator 	beg = preview->begin(),end = preview->end();
-		studio::Preview::FlipBook::const_iterator 	i;
+		studio::Preview::FlipBook::const_iterator
+			beg = preview->begin(),
+			end = preview->end();
+
+		studio::Preview::FlipBook::const_iterator i;
 
 		i = beg;
 
 		//go to current hint if need be...
-		if(currentindex >= 0 && currentindex < (int)preview->numframes())
+		if (currentindex >= 0 && currentindex < (int)preview->numframes())
 		{
 			i = beg+currentindex;
 		}
 
 		//we can't have a picture if there are none to get
-		if(beg != end)
+		if (beg != end)
 		{
 			//don't bother with binary search it will just be slower...
 
@@ -652,21 +705,21 @@ void studio::Widget_Preview::update()
 
 			//incrementally go in either direction
 			//(bias downward towards beg, because that's what we want)
-			for(;i != end;++i)
+			for (;i != end;++i)
 			{
 				//synfig::info("Look at %f",i->t);
-				if(i->t > time) break;
+				if (i->t > time) break;
 				//synfig::info("Go past...");
 			}
 
 			//if(i!=beg)--i;
 
 			//bias down, so we can't be at end... and it still is valid...
-			for(;i != beg;)
+			for (;i != beg;)
 			{
 				--i;
 				//synfig::info("Look at %f",i->t);
-				if(i->t <= time) break;
+				if (i->t <= time) break;
 				//synfig::info("Go past...");
 			}
 
@@ -682,7 +735,7 @@ void studio::Widget_Preview::update()
 			//we should be at a valid edge since we biased downward
 
 			//don't get the closest, round down... (if we can)
-			if(i == end)
+			if (i == end)
 			{
 				synfig::error("i == end....");
 				//assert(0);
@@ -694,10 +747,10 @@ void studio::Widget_Preview::update()
 			{
 				currentbuf = i->buf;
 				currentindex = i-beg;
-				if(current_surface)
+				if (current_surface)
 					cairo_surface_destroy(current_surface);
 				current_surface= cairo_surface_reference(i->surface);
-				if(timedisp != i->t)
+				if (timedisp != i->t)
 				{
 					timedisp = i->t;
 					//synfig::warning("Update at: %f seconds (%f s)",time,timedisp);
@@ -709,15 +762,19 @@ void studio::Widget_Preview::update()
 	}
 
 	//current frame in previewing
-	Glib::ustring timecode(Time((double)timedisp).round(preview->get_global_fps())
-                .get_string(preview->get_global_fps(), App::get_time_format()));
+	Glib::ustring timecode(
+		Time((double)timedisp).round(preview->get_global_fps()).get_string(
+		preview->get_global_fps(), App::get_time_format()));
 	l_currenttime.set_text(timecode);
 
 }
+
+
 void studio::Widget_Preview::preview_draw()
 {
 	draw_area.queue_draw();//on_expose_event();
 }
+
 
 bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 {
@@ -725,20 +782,20 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 	Glib::RefPtr<Gdk::Pixbuf> pxnew, px = currentbuf;
 	cairo_surface_t* cs;
 	bool use_cairo= preview->get_use_cairo();
-	if(use_cairo)
+	if (use_cairo)
 	{
-		if(current_surface)
+		if (current_surface)
 			cs=cairo_surface_reference(current_surface);
 		else
 			return true;
 	}
-	
+
 	int dw = draw_area.get_width();
 	int dh = draw_area.get_height();
-	
-	if(use_cairo && !cs)
+
+	if (use_cairo && !cs)
 		return true;
-	else if(!use_cairo && !px)
+	else if (!use_cairo && !px)
 		return true;
 	//made not need this line
 	//if ( draw_area.get_height() == 0 || px->get_height() == 0 || px->get_width() == 0)
@@ -748,14 +805,15 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 	float sx, sy;
 	float q = 1 / preview->get_zoom();
 	int nw, nh;
-	int w,h;
-	
+	int w, h;
+
 	// grab the source dimensions
-	if(use_cairo)
+	if (use_cairo)
 	{
 		w=cairo_image_surface_get_width(cs);
 		h=cairo_image_surface_get_height(cs);
 	}
+
 	else
 	{
 		w=px->get_width();
@@ -775,7 +833,7 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 		//synfig::info("widget_preview redraw: now to scale the bitmap: %.3f x %.3f",sx,sy);
 
 		//round to smallest scale (fit entire thing in window without distortion)
-		if(sx > sy) sx = sy;
+		if (sx > sy) sx = sy;
 
 		//cleanup previous size request
 		draw_area.set_size_request();
@@ -799,9 +857,9 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 	nw = (int)(w * sx);
 	nh = (int)(h * sx);
 
-	if(nw == 0 || nh == 0)return true;
+	if (nw == 0 || nh == 0)return true;
 
-	if(!use_cairo)
+	if (!use_cairo)
 		pxnew = px->scale_simple(nw, nh, Gdk::INTERP_NEAREST);
 
 	//except "Fit" or "fit", we need to set size request for scrolled window
@@ -815,9 +873,9 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 	//synfig::info("Now to draw to the window...");
 	//copy to window
 	Glib::RefPtr<Gdk::Window> wind = draw_area.get_window();
-	if(!wind) synfig::warning("The destination window is broken...");
+	if (!wind) synfig::warning("The destination window is broken...");
 
-	if(!use_cairo)
+	if (!use_cairo)
 	{
 		/* Options for drawing...
 			1) store with alpha, then clear and render with alpha every frame
@@ -840,12 +898,15 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 		cr->paint();
 		cr->restore();
 	}
+
 	else
 	{
 		cr->save();
 		cr->scale(sx, sx);
-		cairo_set_source_surface(cr->cobj(), cs, (dw - nw)/(2*sx), (dh - nh)/(2*sx));
-		cairo_pattern_set_filter(cairo_get_source(cr->cobj()), CAIRO_FILTER_NEAREST);
+		cairo_set_source_surface(cr->cobj(), cs, (dw - nw)/(2*sx),
+								(dh - nh)/(2*sx));
+		cairo_pattern_set_filter(cairo_get_source(cr->cobj()),
+								CAIRO_FILTER_NEAREST);
 		cairo_surface_destroy(cs);
 		cr->paint();
 		cr->restore();
@@ -857,12 +918,13 @@ bool studio::Widget_Preview::redraw(const Cairo::RefPtr<Cairo::Context> &cr)
 	return false;
 }
 
+
 bool studio::Widget_Preview::play_update()
 {
 	float diff = timer.pop_time();
 	//synfig::info("Play update: diff = %.2f",diff);
 
-	if(playing)
+	if (playing)
 	{
 		//we go to the next one...
 		double time = adj_time_scrub->get_value() + diff;
@@ -880,15 +942,16 @@ bool studio::Widget_Preview::play_update()
 			stop_on_end = false;
 #endif
 		}
+
 		else
 		{
 			time = soundProcessor.get_position();
 		}
 
 		//Looping conditions...
-		if(time >= adj_time_scrub->get_upper())
+		if (time >= adj_time_scrub->get_upper())
 		{
-			if(get_loop_flag())
+			if (get_loop_flag())
 			{
 				time = adj_time_scrub->get_lower();// + time-adj_time_scrub.get_upper();
 				currentindex = 0;
@@ -915,6 +978,7 @@ bool studio::Widget_Preview::play_update()
 	return true;
 }
 
+
 void studio::Widget_Preview::slider_move()
 {
 	//if(!playing)
@@ -924,28 +988,31 @@ void studio::Widget_Preview::slider_move()
 	}
 }
 
-//for other things updating the value changed signal...
+
+// for other things updating the value changed signal...
 void studio::Widget_Preview::scrub_updated(double t)
 {
 	if (playing) on_play_pause_pressed();
 
 	//synfig::info("Scrubbing to %.3f, setting adj to %.3f",oldt,t);
 
-	if(adj_time_scrub->get_value() != t)
+	if (adj_time_scrub->get_value() != t)
 	{
 		adj_time_scrub->set_value(t);
 		adj_time_scrub->value_changed();
 	}
 }
 
+
 void studio::Widget_Preview::disconnect_preview(Preview *prev)
 {
-	if(prev == preview)
+	if (prev == preview)
 	{
 		preview = 0;
 		prevchanged.disconnect();
 	}
 }
+
 
 void studio::Widget_Preview::set_preview(etl::handle<Preview>	prev)
 {
@@ -958,14 +1025,14 @@ void studio::Widget_Preview::set_preview(etl::handle<Preview>	prev)
 	//stop playing the mini animation...
 	pause();
 
-	if(preview)
+	if (preview)
 	{
 		//set the internal values
 		float rate = preview->get_fps();
 		jackdial->set_fps(rate);
 		jackdial->set_offset(preview->get_jack_offset());
-		synfig::info("	FPS = %f",rate);
-		if(rate)
+		synfig::info("	FPS = %f", rate);
+		if (rate)
 		{
 			float start = preview->get_begintime();
 			float end = preview->get_endtime();
@@ -993,21 +1060,26 @@ void studio::Widget_Preview::set_preview(etl::handle<Preview>	prev)
 		preview->get_canvas()->fill_sound_processor(soundProcessor);
 
 		//connect so future information will be found...
-		prevchanged = prev->signal_changed().connect(sigc::mem_fun(*this,&Widget_Preview::whenupdated));
-		prev->signal_destroyed().connect(sigc::mem_fun(*this,&Widget_Preview::disconnect_preview));
+		prevchanged = prev->signal_changed().connect(sigc::mem_fun(*this,
+							&Widget_Preview::whenupdated));
+		prev->signal_destroyed().connect(sigc::mem_fun(*this,
+							&Widget_Preview::disconnect_preview));
 		update();
 		//synfig::warning("Did update sp");
 		queue_draw();
 	}
 }
 
+
 void studio::Widget_Preview::whenupdated()
 {
 	l_lasttime.set_text((Time((double)(--preview->end())->t)
 							.round(preview->get_global_fps())
-							.get_string(preview->get_global_fps(),App::get_time_format())));
+							.get_string(preview->get_global_fps(),
+							App::get_time_format())));
 	update();
 }
+
 
 void studio::Widget_Preview::clear()
 {
@@ -1016,12 +1088,14 @@ void studio::Widget_Preview::clear()
 	soundProcessor.clear();
 }
 
+
 void studio::Widget_Preview::play()
 {
 	if (playing) return;
-	if(preview)
+	if (preview)
 	{
-		if (!jack_enabled && get_position() == get_time_end()) seek(get_time_start());
+		if (!jack_enabled && get_position() == get_time_end())
+				seek(get_time_start());
 		soundProcessor.set_playing(true);
 
 		//synfig::info("Playing at %lf",adj_time_scrub->get_value());
@@ -1042,10 +1116,12 @@ void studio::Widget_Preview::play()
 
 		//signal_play_(adj_time_scrub->get_value());
 
-		timecon = Glib::signal_timeout().connect(sigc::mem_fun(*this,&Widget_Preview::play_update),timeout);
+		timecon = Glib::signal_timeout().connect(sigc::mem_fun(*this,
+				&Widget_Preview::play_update), timeout);
 		timer.reset();
 	}
 }
+
 
 void studio::Widget_Preview::pause()
 {
@@ -1057,6 +1133,7 @@ void studio::Widget_Preview::pause()
 	soundProcessor.set_playing(false);
 }
 
+
 void studio::Widget_Preview::on_play_pause_pressed()
 {
 	bool play_flag;
@@ -1066,7 +1143,7 @@ void studio::Widget_Preview::on_play_pause_pressed()
 	Gtk::Image *icon;
 
 	play_flag = !playing;
-	
+
 #ifdef WITH_JACK
 	if (jack_enabled)
 	{
@@ -1079,31 +1156,34 @@ void studio::Widget_Preview::on_play_pause_pressed()
 	}
 #endif
 
-	if(play_flag) play(); else pause();
+	if (play_flag) play(); else pause();
 }
+
 
 void studio::Widget_Preview::seek_frame(int frames)
 {
 //	if(!frames)	return;
 
-	if(playing) on_play_pause_pressed();	//pause playing when seek frame called
+	if (playing) on_play_pause_pressed();
+		//pause playing when seek frame called
 
 	double fps = preview->get_fps();
 
 	double currenttime = adj_time_scrub->get_value();
 	int currentframe = (int)floor(currenttime * fps);
 	Time newtime(double((currentframe + frames + 0.5) / fps));
-	
+
 	adj_time_scrub->set_value(newtime);
 }
 
+
 bool studio::Widget_Preview::scroll_move_event(GdkEvent *event)
 {
-	switch(event->type)
+	switch (event->type)
 	{
 		case GDK_BUTTON_PRESS:
 		{
-			if(event->button.button == 1 || event->button.button == 3)
+			if (event->button.button == 1 || event->button.button == 3)
 			{
 				pause();
 			}
@@ -1115,6 +1195,7 @@ bool studio::Widget_Preview::scroll_move_event(GdkEvent *event)
 
 	return false;
 }
+
 
 synfig::Time studio::Widget_Preview::get_position() const
 	{ return adj_time_scrub->get_value(); }
@@ -1129,9 +1210,10 @@ void studio::Widget_Preview::seek(const synfig::Time &t)
 	adj_time_scrub->set_value(t);
 }
 
+
 void studio::Widget_Preview::repreview()
 {
-	if(preview)
+	if (preview)
 	{
 		stoprender();
 		pause();
@@ -1139,9 +1221,10 @@ void studio::Widget_Preview::repreview()
 	}
 }
 
+
 void studio::Widget_Preview::stoprender()
 {
-	if(preview)
+	if (preview)
 	{
 		// don't crash if the render has already been stopped
 		if (!preview->renderer)
@@ -1156,24 +1239,26 @@ void studio::Widget_Preview::stoprender()
 	}
 }
 
+
 void studio::Widget_Preview::eraseall()
 {
 	pause();
 	stoprender();
 
 	currentbuf.clear();
-	if(current_surface)
+	if (current_surface)
 		cairo_surface_destroy(current_surface);
 	current_surface=NULL;
 	currentindex = 0;
 	timedisp = 0;
 	queue_draw();
 
-	if(preview)
+	if (preview)
 	{
 		preview->clear();
 	}
 }
+
 
 void Widget_Preview::on_zoom_entry_activated()
 {
@@ -1210,6 +1295,7 @@ void Widget_Preview::on_zoom_entry_activated()
 	preview_window.grab_focus();
 }
 
+
 void Widget_Preview::hide_toolbar()
 {
 	toolbar->hide();
@@ -1219,6 +1305,7 @@ void Widget_Preview::hide_toolbar()
 	preview_window.grab_focus();
 }
 
+
 void Widget_Preview::show_toolbar()
 {
 	toolbar->show();
@@ -1226,7 +1313,8 @@ void Widget_Preview::show_toolbar()
 	toolbar->grab_focus();
 }
 
-//shortcut keys TODO: customizable shortcut keys would be awesome.
+
+// shortcut keys TODO: customizable shortcut keys would be awesome.
 bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 {
 	//hide and show toolbar
@@ -1240,7 +1328,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 	//previous rendered frame
 	if (ev->keyval == gdk_keyval_from_name("a"))
 	{
-		if(playing) pause();
+		if (playing) pause();
 		seek_frame(-1);
 		return true;
 	}
@@ -1255,7 +1343,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 	//next render frame
 	if (ev->keyval == gdk_keyval_from_name("d"))
 	{
-		if(playing) pause();
+		if (playing) pause();
 		seek_frame(+1);
 		return true;
 	}
@@ -1263,7 +1351,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 	//loop
 	if (ev->keyval == gdk_keyval_from_name("f"))
 	{
-		if(get_loop_flag()) set_loop_flag(false);
+		if (get_loop_flag()) set_loop_flag(false);
 		else set_loop_flag(true);
 		return true;
 	}
@@ -1275,7 +1363,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	if (ev->keyval == gdk_keyval_from_name("1"))
 	{
-		if(entry->get_text() != "25%")
+		if (entry->get_text() != "25%")
 		{
 			entry->set_text("25%");
 		}
@@ -1284,7 +1372,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	if (ev->keyval == gdk_keyval_from_name("2"))
 	{
-		if(entry->get_text() != "50%")
+		if (entry->get_text() != "50%")
 		{
 			entry->set_text("50%");
 		}
@@ -1293,7 +1381,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	if (ev->keyval == gdk_keyval_from_name("3"))
 	{
-		if(entry->get_text() != "100%")
+		if (entry->get_text() != "100%")
 		{
 			entry->set_text("100%");
 		}
@@ -1302,7 +1390,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	if (ev->keyval == gdk_keyval_from_name("4"))
 	{
-		if(entry->get_text() != "200%")
+		if (entry->get_text() != "200%")
 		{
 			entry->set_text("200%");
 		}
@@ -1311,7 +1399,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	if (ev->keyval == gdk_keyval_from_name("5"))
 	{
-		if(entry->get_text() != _("Fit"))
+		if (entry->get_text() != _("Fit"))
 		{
 			entry->set_text(_("Fit"));
 		}
@@ -1320,6 +1408,7 @@ bool studio::Widget_Preview::on_key_pressed(GdkEventKey *ev)
 
 	return false;
 }
+
 
 bool
 Widget_Preview::is_time_equal_to_current_frame(const synfig::Time &time)
@@ -1342,6 +1431,7 @@ Widget_Preview::is_time_equal_to_current_frame(const synfig::Time &time)
 	return t0.is_equal(t1);
 }
 
+
 void Widget_Preview::set_jack_enabled(bool value) {
 	if (jack_enabled == value) return;
 #ifdef WITH_JACK
@@ -1359,6 +1449,7 @@ void Widget_Preview::set_jack_enabled(bool value) {
 			jack_enabled = false;
 		}
 	}
+
 	else
 	{
 		// deinitialize jack
@@ -1375,22 +1466,23 @@ void Widget_Preview::set_jack_enabled(bool value) {
 
 	if (jackbutton->get_active())
 	{
-		icon = manage(new Gtk::Image(Gtk::StockID("synfig-jack"),iconsize));
+		icon = manage(new Gtk::Image(Gtk::StockID("synfig-jack"), iconsize));
 		jackbutton->remove();
 		jackbutton->add(*icon);
 		jackbutton->set_tooltip_text(_("Disable JACK"));
-		icon->set_padding(0,0);
+		icon->set_padding(0, 0);
 		icon->show();
 
 		offset_widget->show();
 	}
+
 	else
 	{
-		icon = manage(new Gtk::Image(Gtk::StockID("synfig-jack"),iconsize));
+		icon = manage(new Gtk::Image(Gtk::StockID("synfig-jack"), iconsize));
 		jackbutton->remove();
 		jackbutton->add(*icon);
 		jackbutton->set_tooltip_text(_("Enable JACK"));
-		icon->set_padding(0,0);
+		icon->set_padding(0, 0);
 		icon->show();
 
 		offset_widget->hide();
@@ -1405,16 +1497,20 @@ void Widget_Preview::toggle_jack_button()
 	set_jack_enabled(!get_jack_enabled());
 }
 
+
 void Widget_Preview::on_jack_offset_changed() {
 	jack_offset = jackdial->get_offset();
 	if (get_jack_enabled()) on_jack_sync();
 }
 
+
 void Widget_Preview::on_jack_sync() {
 	jack_position_t pos;
 	jack_transport_state_t state = jack_transport_query(jack_client, &pos);
 
-	jack_is_playing = state == JackTransportRolling || state == JackTransportStarting;
+	jack_is_playing = state == JackTransportRolling ||
+						state == JackTransportStarting;
+
 	jack_time = Time((Time::value_type)pos.frame/(Time::value_type)pos.frame_rate);
 
 	if (playing != jack_is_playing)
@@ -1433,9 +1529,13 @@ void Widget_Preview::on_jack_sync() {
 	}
 }
 
-int Widget_Preview::jack_sync_callback(jack_transport_state_t /* state */, jack_position_t * /* pos */, void *arg) {
+
+int Widget_Preview::jack_sync_callback(jack_transport_state_t /* state */,
+			jack_position_t * /* pos */, void *arg) {
 	Widget_Preview *widget_preview = static_cast<Widget_Preview*>(arg);
 	widget_preview->jack_dispatcher.emit();
 	return 1;
 }
+
+
 #endif
