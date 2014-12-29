@@ -33,7 +33,7 @@
 					*/
 
 #include <gtkmm/drawingarea.h>
-#include <gtkmm/table.h>
+#include <gtkmm/grid.h>
 #include <gtkmm/adjustment.h>
 #include <gtkmm/image.h>
 #include <gdkmm/pixbuf.h>
@@ -210,7 +210,7 @@ public:
 };
 
 
-class Widget_Preview : public Gtk::Table
+class Widget_Preview : public Gtk::Grid
 {
 	Gtk::DrawingArea draw_area;
 	Glib::RefPtr<Gtk::Adjustment> adj_time_scrub;

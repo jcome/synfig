@@ -396,7 +396,7 @@ void studio::Preview::frame_finish(const Preview_Target *targ)
 	icon->show();
 
 Widget_Preview::Widget_Preview():
-	Gtk::Table(1, 5),
+	Gtk::Grid(),
 	adj_time_scrub(Gtk::Adjustment::create(0, 0, 1000, 0, 10, 0)),
 	scr_time_scrub(adj_time_scrub),
 	b_loop(/*_("Loop")*/),
@@ -641,10 +641,10 @@ Widget_Preview::Widget_Preview():
 	status->show_all();
 
 	// attach all widgets
-	attach(preview_window, 0, 1, 0, 1, Gtk::EXPAND|Gtk::FILL, Gtk::EXPAND|Gtk::FILL, 0);
-	attach(scr_time_scrub, 0, 1, 1, 2, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
-	attach(*toolbar, 0, 1, 2, 3, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK|Gtk::FILL);
-	attach(*status, 0, 1, 3, 4, Gtk::EXPAND|Gtk::FILL, Gtk::SHRINK);
+	attach(preview_window, 0, 0, 3, 1);
+	attach(scr_time_scrub, 0, 1, 3, 1);
+	attach(*toolbar, 0, 2, 1, 1);
+	attach(*status, 0, 3, 1, 1);
 	preview_window.show_all();
 	scr_time_scrub.show_all();
 
