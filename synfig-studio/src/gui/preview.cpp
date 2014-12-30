@@ -429,7 +429,13 @@ Widget_Preview::Widget_Preview():
 	//manage all the change in values etc...
 
 	//1st row: preview content
+	// enable scrollbar on demand
 	preview_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+
+	// let preview content to expand horizontally and vertically
+	preview_window.set_hexpand(true);
+	preview_window.set_vexpand(true);
+
 	//pack preview content into scrolled window
 	preview_window.add(draw_area);
 
