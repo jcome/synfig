@@ -465,8 +465,11 @@ Widget_Preview::Widget_Preview():
 
 	#if 1
 
-	//2nd row: prevframe play/pause nextframe loop | halt-render re-preview erase-all  
-	toolbar = Gtk::manage(new class Gtk::HBox(false, 0));
+	//2nd row:
+	// [prevframe] [play/pause] [nextframe] [loop] | [halt-render]
+	// [re-preview] [erase-all] [jack] [zoom]
+	toolbar = Gtk::manage(new class Gtk::Box());
+	toolbar->set_hexpand(true);
 
 	//prev rendered frame
 	Gtk::Button *prev_framebutton;
@@ -535,7 +538,6 @@ Widget_Preview::Widget_Preview():
 	space->set_size_request(8);
 	toolbar->pack_start(*space, false, true);
 
-
 	//loop
 	button = &b_loop;
 	IMAGIFY_BUTTON(button, "synfig-animate_loop", _("Loop"));
@@ -545,7 +547,6 @@ Widget_Preview::Widget_Preview():
 	Gtk::Alignment *space1 = Gtk::manage(new Gtk::Alignment());
 	space1->set_size_request(24);
 	toolbar->pack_start(*space1, false, true);
-
 
 	//halt render
 	button = manage(new Gtk::Button(/*_("Halt Render")*/));
@@ -571,11 +572,6 @@ Widget_Preview::Widget_Preview():
 
 	toolbar->pack_start(*button, Gtk::PACK_SHRINK, 0);
 
-	//spacing
-	Gtk::Alignment *space2 = Gtk::manage(new Gtk::Alignment());
-	space1->set_size_request(24);
-	toolbar->pack_start(*space2, false, true);
-
 	//jack
 	jackdial = Gtk::manage(new JackDial());
 #ifdef WITH_JACK
@@ -594,6 +590,12 @@ Widget_Preview::Widget_Preview():
 	if ( !getenv("SYNFIG_DISABLE_JACK") )
 		jackdial->show();
 	toolbar->pack_start(*jackdial, false, true);
+
+	//spacing
+	Gtk::Alignment *space2 = Gtk::manage(new Gtk::Alignment());
+	space2->set_size_request(128);
+	space->set_hexpand(true);
+	toolbar->pack_start(*space2, false, true);
 
 	//zoom preview
 	factor_refTreeModel = Gtk::ListStore::create(factors);
